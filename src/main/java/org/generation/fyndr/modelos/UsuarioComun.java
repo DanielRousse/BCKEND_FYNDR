@@ -1,27 +1,39 @@
 package org.generation.fyndr.modelos;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * Clase que representa a un usuario comun en el sistema Fyndr.
+ * Clase que representa a un usuario comun en el sistema Fyndr y mapea a la base de datos.
  */
+@Entity
+@Table(name = "usuario_comun")
 public class UsuarioComun {
 
-    private Long id;
-    private String nombre;
-    private String email;
-    private String telefono;
-    private String contrasena;
-    private LocalDateTime fechaRegistro;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario_comun")
+    private Integer id;
 
-    private static Long total = 0L;
+    @Column(nullable = false, length = 100)
+    private String nombre;
+
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+
+    @Column(nullable = false, length = 15)
+    private String telefono;
+
+    @Column(nullable = false, length = 255)
+    private String contrasena;
+
+    @Column(name = "fecha_registro", insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime fechaRegistro;
 
     public UsuarioComun() {
     } // UsuarioComun
 
     public UsuarioComun(String nombre, String email, String telefono, String contrasena, LocalDateTime fechaRegistro) {
-        total++;
-        this.id = total;
         this.nombre = nombre;
         this.email = email;
         this.telefono = telefono;
@@ -29,7 +41,7 @@ public class UsuarioComun {
         this.fechaRegistro = fechaRegistro;
     } // UsuarioComun
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     } // getId
 

@@ -1,75 +1,67 @@
 package org.generation.fyndr.servicios;
 
 import org.generation.fyndr.modelos.UsuarioComun;
+import org.generation.fyndr.repositorios.UsuarioComunRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
- * Servicio para gestionar las operaciones de los usuarios comunes en memoria local.
+ * Servicio para gestionar las operaciones de los usuarios comunes conectandose a JPA.
  */
 @Service
 public class UsuarioComunService {
 
-    private final ArrayList<UsuarioComun> lista = new ArrayList<>();
+    private final UsuarioComunRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioComunService() {
-        lista.add(new UsuarioComun("Juan Perez", "juan@example.com", "5551234567", "Password123!", LocalDateTime.now()));
-        lista.add(new UsuarioComun("Maria Lopez", "maria@example.com", "5557654321", "SecurePass456!", LocalDateTime.now()));
+    @Autowired
+    public UsuarioComunService(UsuarioComunRepository repository, PasswordEncoder passwordEncoder) {
+        this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     } // UsuarioComunService
 
     public ArrayList<UsuarioComun> getEntidades() {
-        return lista;
+        return new ArrayList<>(repository.findAll());
     } // getEntidades
 
-    public UsuarioComun getEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            UsuarioComun u = lista.get(i);
-            if (u.getId().equals(id)) {
-                return u;
-            } // if
-        } // for
-        return null;
+    public UsuarioComun getEntidad(Integer id) {
+        return repository.findById(id).orElse(null);
     } // getEntidad
 
     public UsuarioComun crearEntidad(UsuarioComun obj) {
-        UsuarioComun nuevo = new UsuarioComun(obj.getNombre(), obj.getEmail(), obj.getTelefono(), obj.getContrasena(), LocalDateTime.now());
-        lista.add(nuevo);
-        return nuevo;
+        obj.setContrasena(passwordEncoder.encode(obj.getContrasena()));
+        return repository.save(obj);
     } // crearEntidad
 
-    public UsuarioComun deleteEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            UsuarioComun u = lista.get(i);
-            if (u.getId().equals(id)) {
-                UsuarioComun ref = u;
-                lista.remove(i);
-                return ref;
-            } // if
-        } // for
+    public UsuarioComun deleteEntidad(Integer id) {
+        UsuarioComun ref = getEntidad(id);
+        if (ref != null) {
+            repository.delete(ref);
+            return ref;
+        } // if
         return null;
     } // deleteEntidad
 
-    public UsuarioComun actualizarEntidad(Long id, String nombre, String email, String telefono, String contrasena) {
-        for (int i = 0; i < lista.size(); i++) {
-            UsuarioComun u = lista.get(i);
-            if (u.getId().equals(id)) {
-                if (nombre != null) {
-                    u.setNombre(nombre);
-                } // if
-                if (email != null) {
-                    u.setEmail(email);
-                } // if
-                if (telefono != null) {
-                    u.setTelefono(telefono);
-                } // if
-                if (contrasena != null) {
-                    u.setContrasena(contrasena);
-                } // if
-                return u;
+    public UsuarioComun actualizarEntidad(Integer id, String nombre, String email, String telefono, String contrasena) {
+        UsuarioComun u = getEntidad(id);
+        if (u != null) {
+            if (nombre != null) {
+                u.setNombre(nombre);
             } // if
-        } // for
+            if (email != null) {
+                u.setEmail(email);
+            } // if
+            if (telefono != null) {
+                u.setTelefono(telefono);
+            } // if
+            if (contrasena != null) {
+                u.setContrasena(passwordEncoder.encode(contrasena));
+            } // if
+            return repository.save(u);
+        } // if
         return null;
     } // actualizarEntidad
 } // class UsuarioComunService

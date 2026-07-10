@@ -30,7 +30,7 @@ public class UsuarioComunController {
     } // getUsuarios
 
     @GetMapping(path="{entidadId}")
-    public UsuarioComun getUsuario(@PathVariable("entidadId") Long id) {
+    public UsuarioComun getUsuario(@PathVariable("entidadId") Integer id) {
         // GET http://localhost:8080/api/usuarios-comunes/1
         return service.getEntidad(id);
     } // getUsuario
@@ -42,13 +42,13 @@ public class UsuarioComunController {
     } // crearUsuario
 
     @PutMapping(path="{entidadId}")
-    public UsuarioComun actualizarUsuario(@PathVariable("entidadId") Long id, @RequestBody UsuarioComunDTO dto) {
+    public UsuarioComun actualizarUsuario(@PathVariable("entidadId") Integer id, @RequestBody UsuarioComunDTO dto) {
         // PUT http://localhost:8080/api/usuarios-comunes/1
         return service.actualizarEntidad(id, dto.getNombre(), dto.getEmail(), dto.getTelefono(), dto.getContrasena());
     } // actualizarUsuario
 
     @DeleteMapping(path="{entidadId}")
-    public UsuarioComun eliminarUsuario(@PathVariable("entidadId") Long id) {
+    public UsuarioComun eliminarUsuario(@PathVariable("entidadId") Integer id) {
         // DELETE http://localhost:8080/api/usuarios-comunes/1
         return service.deleteEntidad(id);
     } // eliminarUsuario
