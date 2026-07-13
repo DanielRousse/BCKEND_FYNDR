@@ -1,98 +1,33 @@
-package org.generation.fyndr.modelos;
-
-import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
+package org.generation.fyndr.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-/**
- * Clase que representa a un usuario trabajador en el sistema Fyndr.
- */
+public class TrabajadorDTO {
 
-@Entity
-@Table(name = "usuario_trabajador")
-public class UsuarioTrabajador {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario_trabajador", unique=true, nullable = false)
-    private Long id;
-
-    @Column(name = "nombre", nullable = false)
     private String nombre;
-
-    @Column(name = "email" , nullable = false, unique = true)
     private String email;
-
-    @Column(name = "telefono", nullable = false)
     private String telefono;
-
-    @Column(name = "contrasena", nullable = false)
     private String contrasena;
-
-    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
-
-    @Column(name = "ine_path")
     private String inePath;
-
-    @Column(name = "curp" , unique = true)
     private String curp;
-
-    @Column(name = "fotografia_path")
     private String fotografiaPath;
-
-    @Column(name = "comprobante_path")
     private String comprobantePath;
-
-    @Column(name = "antecedentes_path")
     private String antecedentesPath;
-
-    @ColumnDefault("0")
-    @Column(name = "experiencia_anos")
     private Integer experienciaAnos;
-
-    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
-
-    @Column(name = "subespecialidades")
-    private String subespecialidades;
-
-    @Column(name = "certificaciones_path")
+    private String subspecialidades;
     private String certificacionesPath;
-
-    @Column(name = "portafolio_path")
     private String portafolioPath;
-
-    @Column(name = "rfc", unique = true)
     private String rfc;
-
-    @Column(name = "constancia_fiscal_path")
     private String constanciaFiscalPath;
-
-    @Column(name = "clabe")
     private String clabe;
-
-    @Column(name = "banco")
     private String banco;
-
-    @Column(name = "tarifa_hora", precision = 10, scale = 2)
     private BigDecimal tarifaHora;
-
-    @Column(name = "calificacion_promedio", precision = 3 , scale = 2)
     private BigDecimal calificacionPromedio;
 
-    @Column(name = "fecha_registro", insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime fechaRegistro;
-
-
-
-    public UsuarioTrabajador() {
-    } // UsuarioTrabajador
-
-    public UsuarioTrabajador(String nombre, String email, String telefono, String contrasena, LocalDate fechaNacimiento, String inePath, String curp, String fotografiaPath, String comprobantePath, String antecedentesPath, Integer experienciaAnos, String descripcion, String subespecialidades, String certificacionesPath, String portafolioPath, String rfc, String constanciaFiscalPath, String clabe, String banco, BigDecimal tarifaHora, BigDecimal calificacionPromedio, LocalDateTime fechaRegistro) {
+    public TrabajadorDTO(String nombre, String email, String telefono, String contrasena, LocalDate fechaNacimiento, String inePath, String curp, String fotografiaPath, String comprobantePath, String antecedentesPath, Integer experienciaAnos, String descripcion, String subspecialidades, String certificacionesPath, String portafolioPath, String rfc, String constanciaFiscalPath, String clabe, String banco, BigDecimal tarifaHora, BigDecimal calificacionPromedio) {
         this.nombre = nombre;
         this.email = email;
         this.telefono = telefono;
@@ -105,7 +40,7 @@ public class UsuarioTrabajador {
         this.antecedentesPath = antecedentesPath;
         this.experienciaAnos = experienciaAnos;
         this.descripcion = descripcion;
-        this.subespecialidades = subespecialidades;
+        this.subspecialidades = subspecialidades;
         this.certificacionesPath = certificacionesPath;
         this.portafolioPath = portafolioPath;
         this.rfc = rfc;
@@ -114,11 +49,9 @@ public class UsuarioTrabajador {
         this.banco = banco;
         this.tarifaHora = tarifaHora;
         this.calificacionPromedio = calificacionPromedio;
-        this.fechaRegistro = fechaRegistro;
     }
 
-    public Long getId() {
-        return id;
+    public TrabajadorDTO() {
     }
 
     public String getNombre() {
@@ -217,12 +150,12 @@ public class UsuarioTrabajador {
         this.descripcion = descripcion;
     }
 
-    public String getSubespecialidades() {
-        return subespecialidades;
+    public String getSubspecialidades() {
+        return subspecialidades;
     }
 
-    public void setSubespecialidades(String subespecialidades) {
-        this.subespecialidades = subespecialidades;
+    public void setSubspecialidades(String subspecialidades) {
+        this.subspecialidades = subspecialidades;
     }
 
     public String getCertificacionesPath() {
@@ -289,19 +222,10 @@ public class UsuarioTrabajador {
         this.calificacionPromedio = calificacionPromedio;
     }
 
-    public LocalDateTime getFechaRegistro() {
-        return fechaRegistro;
-    }
-
-    public void setFechaRegistro(LocalDateTime fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
-    }
-
     @Override
     public String toString() {
-        return "UsuarioTrabajador{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
+        return "TrabajadorDTO{" +
+                "nombre='" + nombre + '\'' +
                 ", email='" + email + '\'' +
                 ", telefono='" + telefono + '\'' +
                 ", contrasena='" + contrasena + '\'' +
@@ -313,7 +237,7 @@ public class UsuarioTrabajador {
                 ", antecedentesPath='" + antecedentesPath + '\'' +
                 ", experienciaAnos=" + experienciaAnos +
                 ", descripcion='" + descripcion + '\'' +
-                ", subespecialidades='" + subespecialidades + '\'' +
+                ", subspecialidades='" + subspecialidades + '\'' +
                 ", certificacionesPath='" + certificacionesPath + '\'' +
                 ", portafolioPath='" + portafolioPath + '\'' +
                 ", rfc='" + rfc + '\'' +
@@ -322,7 +246,6 @@ public class UsuarioTrabajador {
                 ", banco='" + banco + '\'' +
                 ", tarifaHora=" + tarifaHora +
                 ", calificacionPromedio=" + calificacionPromedio +
-                ", fechaRegistro=" + fechaRegistro +
                 '}';
-    } // toString
-} // class UsuarioTrabajador
+    }
+}
