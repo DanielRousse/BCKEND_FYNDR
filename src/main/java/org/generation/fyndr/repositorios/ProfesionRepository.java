@@ -1,7 +1,8 @@
 package org.generation.fyndr.repositorios;
 
-/**
- * Interfaz de repositorio para la entidad Profesion.
- */
-public interface ProfesionRepository {
-} // interface ProfesionRepository
+import org.generation.fyndr.modelos.Profesion;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProfesionRepository extends JpaRepository<Profesion, Long> {
+
+}

@@ -1,66 +1,67 @@
 package org.generation.fyndr.servicios;
 
 import org.generation.fyndr.modelos.Profesion;
+import org.generation.fyndr.repositorios.ProfesionRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * Servicio para gestionar las operaciones de las profesiones en memoria local.
+ * Servicio para gestionar las operaciones CRUD de las profesiones.
  */
 @Service
 public class ProfesionService {
 
-    private final ArrayList<Profesion> lista = new ArrayList<>();
+    private final ProfesionRepository profesionRepository;
 
-    public ProfesionService() {
-        lista.add(new Profesion("Plomeria"));
-        lista.add(new Profesion("Electricidad"));
-        lista.add(new Profesion("Carpinteria"));
-    } // ProfesionService
+    // Inyección del repositorio mediante el constructor.
+    public ProfesionService(ProfesionRepository profesionRepository) {
+        this.profesionRepository = profesionRepository;
+    }
 
-    public ArrayList<Profesion> getEntidades() {
-        return lista;
-    } // getEntidades
+    // Obtener todas las profesiones.
+    public List<Profesion> getEntidades() {
+        return profesionRepository.findAll();
+    }
 
+    // Obtener una profesión por su id.
     public Profesion getEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            Profesion p = lista.get(i);
-            if (p.getId().equals(id)) {
-                return p;
-            } // if
-        } // for
-        return null;
-    } // getEntidad
+        Optional<Profesion> profesion = profesionRepository.findById(id);
+        return profesion.orElse(null);
+    }
 
-    public Profesion crearEntidad(Profesion obj) {
-        Profesion nuevo = new Profesion(obj.getNombreProfesion());
-        lista.add(nuevo);
-        return nuevo;
-    } // crearEntidad
+    // Crear una nueva profesión.
+    public Profesion crearEntidad(Profesion profesion) {
+        return profesionRepository.save(profesion);
+    }
 
+    // Eliminar una profesión.
     public Profesion deleteEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            Profesion p = lista.get(i);
-            if (p.getId().equals(id)) {
-                Profesion ref = p;
-                lista.remove(i);
-                return ref;
-            } // if
-        } // for
-        return null;
-    } // deleteEntidad
+        Optional<Profesion> profesion = profesionRepository.findById(id);
 
-    public Profesion actualizarEntidad(Long id, String nombreProfesion) {
-        for (int i = 0; i < lista.size(); i++) {
-            Profesion p = lista.get(i);
-            if (p.getId().equals(id)) {
-                if (nombreProfesion != null) {
-                    p.setNombreProfesion(nombreProfesion);
-                } // if
-                return p;
-            } // if
-        } // for
+        if (profesion.isPresent()) {
+            profesionRepository.deleteById(id);
+            return profesion.get();
+        }
+
         return null;
-    } // actualizarEntidad
-} // class ProfesionService
+    }
+
+    // Actualizar una profesión.
+    public Profesion actualizarEntidad(Long id, String nombreProfesion) {
+        Optional<Profesion> profesion = profesionRepository.findById(id);
+
+        if (profesion.isPresent()) {
+            Profesion p = profesion.get();
+
+            if (nombreProfesion != null) {
+                p.setNombreProfesion(nombreProfesion);
+            }
+
+            return profesionRepository.save(p);
+        }
+
+        return null;
+    }
+}
