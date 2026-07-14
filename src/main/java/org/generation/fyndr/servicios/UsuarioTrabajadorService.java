@@ -1,11 +1,18 @@
 package org.generation.fyndr.servicios;
 
+import org.generation.fyndr.dto.TrabajadorDTO;
 import org.generation.fyndr.modelos.UsuarioTrabajador;
+import org.generation.fyndr.repositorios.UsuarioTrabajadorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Servicio para gestionar las operaciones de los usuarios trabajadores en memoria local.
@@ -13,115 +20,120 @@ import java.util.ArrayList;
 @Service
 public class UsuarioTrabajadorService {
 
-    private final ArrayList<UsuarioTrabajador> lista = new ArrayList<>();
+    private final UsuarioTrabajadorRepository repository;
 
-    public UsuarioTrabajadorService() {
-        lista.add(new UsuarioTrabajador("Carlos Gomez", "carlos@example.com", "5559876543", "WorkPass789!", LocalDate.of(1990, 5, 10), "ine_carlos.pdf", "GOMC900510HDFRNS01", "carlos.jpg", "comprobante_carlos.pdf", "antecedentes_carlos.pdf", 5, "Plomero experto con 5 anos de experiencia.", "Plomeria, Fugas, Gas", "cert_plomero.pdf", "portafolio_carlos.pdf", "GOXC9005101A1", "constancia_carlos.pdf", "012180012345678901", "Banco de la Union", 250.0, 4.8, LocalDateTime.now()));
-        lista.add(new UsuarioTrabajador("Ana Ruiz", "ana@example.com", "5553456789", "RuizPass321!", LocalDate.of(1995, 8, 15), "ine_ana.pdf", "RUIA950815MDFRNS02", "ana.jpg", "comprobante_ana.pdf", "antecedentes_ana.pdf", 3, "Electricista certificada.", "Electricidad, Cableado", "cert_elect.pdf", "portafolio_ana.pdf", "RUIA9508152B2", "constancia_ana.pdf", "012180098765432102", "Banco del Futuro", 300.0, 4.9, LocalDateTime.now()));
-    } // UsuarioTrabajadorService
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
-    public ArrayList<UsuarioTrabajador> getEntidades() {
-        return lista;
+    @Autowired
+    public UsuarioTrabajadorService(UsuarioTrabajadorRepository repository) {
+        this.repository = repository;
+    }
+
+    public List<UsuarioTrabajador> getEntidades() {
+        return repository.findAll();
     } // getEntidades
 
     public UsuarioTrabajador getEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            UsuarioTrabajador t = lista.get(i);
-            if (t.getId().equals(id)) {
-                return t;
-            } // if
-        } // for
-        return null;
+        return repository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("El usuario-trabajador con el id [" + id + "] no existe"));
     } // getEntidad
 
     public UsuarioTrabajador crearEntidad(UsuarioTrabajador obj) {
-        UsuarioTrabajador nuevo = new UsuarioTrabajador(obj.getNombre(), obj.getEmail(), obj.getTelefono(), obj.getContrasena(), obj.getFechaNacimiento(), obj.getInePath(), obj.getCurp(), obj.getFotografiaPath(), obj.getComprobantePath(), obj.getAntecedentesPath(), obj.getExperienciaAnos(), obj.getDescripcion(), obj.getSubespecialidades(), obj.getCertificacionesPath(), obj.getPortafolioPath(), obj.getRfc(), obj.getConstanciaFiscalPath(), obj.getClabe(), obj.getBanco(), obj.getTarifaHora(), obj.getCalificacionPromedio(), LocalDateTime.now());
-        lista.add(nuevo);
-        return nuevo;
+        Optional<UsuarioTrabajador> usr = repository.findByEmail(obj.getEmail());
+
+        if(usr.isEmpty()){
+            obj.setContrasena(passwordEncoder.encode(obj.getContrasena()));
+            repository.save(obj);
+        }else{
+            obj=null;
+        }
+        return obj;
     } // crearEntidad
 
     public UsuarioTrabajador deleteEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            UsuarioTrabajador t = lista.get(i);
-            if (t.getId().equals(id)) {
-                UsuarioTrabajador ref = t;
-                lista.remove(i);
-                return ref;
-            } // if
-        } // for
-        return null;
+        UsuarioTrabajador usr = null;
+        if(repository.existsById(id)){
+            usr = repository.findById(id).get();
+            repository.deleteById(id);
+        }
+        return usr;
     } // deleteEntidad
 
-    public UsuarioTrabajador actualizarEntidad(Long id, String nombre, String email, String telefono, String contrasena, LocalDate fechaNacimiento, String inePath, String curp, String fotografiaPath, String comprobantePath, String antecedentesPath, Integer experienciaAnos, String descripcion, String subespecialidades, String certificacionesPath, String portafolioPath, String rfc, String constanciaFiscalPath, String clabe, String banco, Double tarifaHora, Double calificacionPromedio) {
-        for (int i = 0; i < lista.size(); i++) {
-            UsuarioTrabajador t = lista.get(i);
-            if (t.getId().equals(id)) {
-                if (nombre != null) {
-                    t.setNombre(nombre);
+    public UsuarioTrabajador actualizarEntidad(Long id, TrabajadorDTO dto) {
+
+            UsuarioTrabajador trabajador = null;
+            if (repository.existsById(id)) {
+                UsuarioTrabajador t = repository.findById(id).get();
+                if (dto.getNombre() != null) {
+                    t.setNombre(dto.getNombre());
                 } // if
-                if (email != null) {
-                    t.setEmail(email);
+                if (dto.getEmail() != null) {
+                    t.setEmail(dto.getEmail());
                 } // if
-                if (telefono != null) {
-                    t.setTelefono(telefono);
+                if (dto.getTelefono() != null) {
+                    t.setTelefono(dto.getTelefono());
                 } // if
-                if (contrasena != null) {
-                    t.setContrasena(contrasena);
+                if (dto.getContrasena() != null) {
+                    t.setContrasena(passwordEncoder.encode((dto.getContrasena())));
                 } // if
-                if (fechaNacimiento != null) {
-                    t.setFechaNacimiento(fechaNacimiento);
+                if (dto.getFechaNacimiento() != null) {
+                    t.setFechaNacimiento(dto.getFechaNacimiento());
                 } // if
-                if (inePath != null) {
-                    t.setInePath(inePath);
+                if (dto.getInePath() != null) {
+                    t.setInePath(dto.getInePath());
                 } // if
-                if (curp != null) {
-                    t.setCurp(curp);
+                if (dto.getCurp() != null) {
+                    t.setCurp(dto.getCurp());
                 } // if
-                if (fotografiaPath != null) {
-                    t.setFotografiaPath(fotografiaPath);
+                if (dto.getFotografiaPath() != null) {
+                    t.setFotografiaPath(dto.getFotografiaPath());
                 } // if
-                if (comprobantePath != null) {
-                    t.setComprobantePath(comprobantePath);
+                if (dto.getComprobantePath() != null) {
+                    t.setComprobantePath(dto.getComprobantePath());
                 } // if
-                if (antecedentesPath != null) {
-                    t.setAntecedentesPath(antecedentesPath);
+                if (dto.getAntecedentesPath() != null) {
+                    t.setAntecedentesPath(dto.getAntecedentesPath());
                 } // if
-                if (experienciaAnos != null) {
-                    t.setExperienciaAnos(experienciaAnos);
+                if (dto.getExperienciaAnos() != null) {
+                    t.setExperienciaAnos(dto.getExperienciaAnos());
                 } // if
-                if (descripcion != null) {
-                    t.setDescripcion(descripcion);
+                if (dto.getDescripcion() != null) {
+                    t.setDescripcion(dto.getDescripcion());
                 } // if
-                if (subespecialidades != null) {
-                    t.setSubespecialidades(subespecialidades);
+                if (dto.getSubspecialidades() != null) {
+                    t.setSubespecialidades(dto.getSubspecialidades());
                 } // if
-                if (certificacionesPath != null) {
-                    t.setCertificacionesPath(certificacionesPath);
+                if (dto.getCertificacionesPath() != null) {
+                    t.setCertificacionesPath(dto.getCertificacionesPath());
                 } // if
-                if (portafolioPath != null) {
-                    t.setPortafolioPath(portafolioPath);
+                if (dto.getPortafolioPath() != null) {
+                    t.setPortafolioPath(dto.getPortafolioPath());
                 } // if
-                if (rfc != null) {
-                    t.setRfc(rfc);
+                if (dto.getRfc() != null) {
+                    t.setRfc(dto.getRfc());
                 } // if
-                if (constanciaFiscalPath != null) {
-                    t.setConstanciaFiscalPath(constanciaFiscalPath);
+                if (dto.getConstanciaFiscalPath() != null) {
+                    t.setConstanciaFiscalPath(dto.getConstanciaFiscalPath());
                 } // if
-                if (clabe != null) {
-                    t.setClabe(clabe);
+                if (dto.getClabe() != null) {
+                    t.setClabe(dto.getClabe());
                 } // if
-                if (banco != null) {
-                    t.setBanco(banco);
+                if (dto.getBanco() != null) {
+                    t.setBanco(dto.getBanco());
                 } // if
-                if (tarifaHora != null) {
-                    t.setTarifaHora(tarifaHora);
+                if (dto.getTarifaHora() != null) {
+                    t.setTarifaHora(dto.getTarifaHora());
                 } // if
-                if (calificacionPromedio != null) {
-                    t.setCalificacionPromedio(calificacionPromedio);
+                if (dto.getCalificacionPromedio() != null) {
+                    t.setCalificacionPromedio(dto.getCalificacionPromedio());
                 } // if
-                return t;
+
+                trabajador = repository.save(t);
+
+
             } // if
-        } // for
-        return null;
+
+        return trabajador;
     } // actualizarEntidad
 } // class UsuarioTrabajadorService

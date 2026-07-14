@@ -1,5 +1,6 @@
 package org.generation.fyndr.controladores;
 
+import org.generation.fyndr.dto.TrabajadorDTO;
 import org.generation.fyndr.modelos.UsuarioTrabajador;
 import org.generation.fyndr.servicios.UsuarioTrabajadorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,17 +42,9 @@ public class UsuarioTrabajadorController {
     } // crearTrabajador
 
     @PutMapping(path="{entidadId}")
-    public UsuarioTrabajador actualizarTrabajador(
-            @PathVariable("entidadId") Long id,
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String telefono,
-            @RequestParam(required = false) String contrasena,
-            @RequestParam(required = false) Double tarifaHora,
-            @RequestParam(required = false) Double calificacionPromedio
-    ) {
+    public UsuarioTrabajador actualizarTrabajador(@PathVariable("entidadId") Long id, @RequestBody TrabajadorDTO dto) {
         // PUT http://localhost:8080/api/usuarios-trabajadores/1
-        return service.actualizarEntidad(id, nombre, email, telefono, contrasena, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, tarifaHora, calificacionPromedio);
+        return service.actualizarEntidad(id, dto);
     } // actualizarTrabajador
 
     @DeleteMapping(path="{entidadId}")
