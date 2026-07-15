@@ -2,7 +2,11 @@ package org.generation.fyndr.controladores;
 
 import org.generation.fyndr.modelos.Resena;
 import org.generation.fyndr.servicios.ResenaService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,46 +19,52 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ResenaController {
 
-    private final ResenaService service;
 
-    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(ResenaController.class);
+
+    private final ResenaService resenaService;
+
     public ResenaController(ResenaService service) {
-        this.service = service;
-    } // ResenaController
+        this.resenaService = service;
+    }
 
     @GetMapping
-    public List<Resena> getResenas() {
-        // GET http://localhost:8080/api/resenas/
-        return service.getEntidades();
-    } // getResenas
+    public ResponseEntity<List<Resena>> getResenas() {
+        ResenaController.logger.info("Iniciando la consulta de reseñas");
+        List<Resena> resenas = resenaService.obtenerResenas();
+        if (resenas.isEmpty()) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(resenas);
+    }
 
-    @GetMapping(path="{entidadId}")
-    public Resena getResena(@PathVariable("entidadId") Long id) {
-        // GET http://localhost:8080/api/resenas/1
-        return service.getEntidad(id);
-    } // getResena
+    @GetMapping("/{entidadId}")
+    public ResponseEntity<Resena> getResena(@PathVariable Integer entidadId) {
+        ResenaController.logger.info("Buscando la reseña con id: {}", entidadId);
+        Resena resena = resenaService.obtenerResena(entidadId);
+        ResenaController.logger.info("Reseña encontrada: {}", resena);
+        return ResponseEntity.ok(resena);
+    }
 
     @PostMapping
-    public Resena crearResena(@RequestBody Resena resena) {
-        // POST http://localhost:8080/api/resenas/
-        return service.crearEntidad(resena);
-    } // crearResena
+    public ResponseEntity<Resena> crearResena(@RequestBody Resena resena) {
+        ResenaController.logger.info("Creando reseña: {}", resena);
+        Resena resenaCreated = resenaService.crearResena(resena);
+        ResenaController.logger.info("Reseña creada: {}", resenaCreated);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resenaCreated);
+    }
 
-    @PutMapping(path="{entidadId}")
-    public Resena actualizarResena(
-            @PathVariable("entidadId") Long id,
-            @RequestParam(required = false) Long idUsuarioComun,
-            @RequestParam(required = false) Long idUsuarioTrabajador,
-            @RequestParam(required = false) Integer calificacion,
-            @RequestParam(required = false) String comentario
-    ) {
-        // PUT http://localhost:8080/api/resenas/1
-        return service.actualizarEntidad(id, idUsuarioComun, idUsuarioTrabajador, calificacion, comentario);
-    } // actualizarResena
+    @PutMapping("/{entidadId}")
+    public ResponseEntity<Resena> actualizarResena(@PathVariable Integer entidadId, @RequestBody Resena resena) {
+        ResenaController.logger.info("Actualizado reseña con id: {}", entidadId);
+        Resena resenaBD = this.resenaService.actualizarResena(entidadId, resena);
+        ResenaController.logger.info("Reseña actualizada: {}", resenaBD);
+        return ResponseEntity.ok(resenaBD);
+    }
 
-    @DeleteMapping(path="{entidadId}")
-    public Resena eliminarResena(@PathVariable("entidadId") Long id) {
-        // DELETE http://localhost:8080/api/resenas/1
-        return service.deleteEntidad(id);
-    } // eliminarResena
-} // class ResenaController
+    @DeleteMapping("/{entidadId}")
+    public ResponseEntity<Void> eliminarResena(@PathVariable Integer entidadId) {
+        ResenaController.logger.info("Eliminando reseña con id: {}", entidadId);
+        this.resenaService.borrarResena(entidadId);
+        return ResponseEntity.noContent().build();
+    }
+
+}

@@ -1,10 +1,17 @@
 package org.generation.fyndr.servicios;
 
 import org.generation.fyndr.modelos.Resena;
+import org.generation.fyndr.modelos.UsuarioComun;
+import org.generation.fyndr.repositorios.ResenaRepository;
+import org.generation.fyndr.repositorios.UsuarioComunRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Servicio para gestionar las operaciones de las resenas en memoria local.
@@ -12,64 +19,66 @@ import java.util.ArrayList;
 @Service
 public class ResenaService {
 
-    private final ArrayList<Resena> lista = new ArrayList<>();
+    private static final Logger logger =  LoggerFactory.getLogger(ResenaService.class);
 
-    public ResenaService() {
-        lista.add(new Resena(1L, 1L, 5, "Excelente plomero, muy rapido y limpio.", LocalDateTime.now()));
-        lista.add(new Resena(2L, 2L, 4, "Buen trabajo electrico, muy puntual.", LocalDateTime.now()));
-    } // ResenaService
+    private final ResenaRepository resenaRepository;
+    private final UsuarioComunRepository usuarioComunRepository;
 
-    public ArrayList<Resena> getEntidades() {
-        return lista;
-    } // getEntidades
+    public ResenaService(ResenaRepository resenaRepository, UsuarioComunRepository usuarioComunRepository) {
+        this.resenaRepository = resenaRepository;
+        this.usuarioComunRepository = usuarioComunRepository;
+    }
 
-    public Resena getEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            Resena r = lista.get(i);
-            if (r.getId().equals(id)) {
-                return r;
-            } // if
-        } // for
-        return null;
-    } // getEntidad
+    public Resena crearResena(Resena resena) {
+        UsuarioComun usuarioComun = this.usuarioComunRepository.findById(resena.getUsuarioComun().getId()).orElseThrow(() -> {
+            ResenaService.logger.error("Usuario común no encontrado: {}", resena.getUsuarioComun());
+            return new RuntimeException("Usuario común no encontrado " +  resena.getUsuarioComun());
+        });
 
-    public Resena crearEntidad(Resena obj) {
-        Resena nuevo = new Resena(obj.getIdUsuarioComun(), obj.getIdUsuarioTrabajador(), obj.getCalificacion(), obj.getComentario(), LocalDateTime.now());
-        lista.add(nuevo);
-        return nuevo;
-    } // crearEntidad
+        ResenaService.logger.info("Usuario Común encontrado: {}", usuarioComun);
+        resena.setUsuarioComun(usuarioComun);
+        resena.setFechaResena(LocalDateTime.now());
 
-    public Resena deleteEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            Resena r = lista.get(i);
-            if (r.getId().equals(id)) {
-                Resena ref = r;
-                lista.remove(i);
-                return ref;
-            } // if
-        } // for
-        return null;
-    } // deleteEntidad
+        ResenaService.logger.info("Creando reseña: {}", resena);
+        return this.resenaRepository.save(resena);
+    }
 
-    public Resena actualizarEntidad(Long id, Long idUsuarioComun, Long idUsuarioTrabajador, Integer calificacion, String comentario) {
-        for (int i = 0; i < lista.size(); i++) {
-            Resena r = lista.get(i);
-            if (r.getId().equals(id)) {
-                if (idUsuarioComun != null) {
-                    r.setIdUsuarioComun(idUsuarioComun);
-                } // if
-                if (idUsuarioTrabajador != null) {
-                    r.setIdUsuarioTrabajador(idUsuarioTrabajador);
-                } // if
-                if (calificacion != null) {
-                    r.setCalificacion(calificacion);
-                } // if
-                if (comentario != null) {
-                    r.setComentario(comentario);
-                } // if
-                return r;
-            } // if
-        } // for
-        return null;
-    } // actualizarEntidad
+    public Resena obtenerResena(Integer id) {
+        return this.resenaRepository.findById(id).orElseThrow(() -> {
+            ResenaService.logger.error("Reseña no encontrada, ID {}", id);
+            return new RuntimeException("Reseña no encontrada, ID " + id);
+        });
+    }
+
+    public List<Resena> obtenerResenas() {
+        var resenas = this.resenaRepository.findAll();
+        ResenaService.logger.info("Lista obtenida de reseñas, cantidad de reseñas: {}", resenas.size());
+        return resenas;
+    }
+
+    public void borrarResena(Integer id) {
+        this.resenaRepository.findById(id).ifPresent(resena -> {
+            ResenaService.logger.info("Reseña eliminada, ID {}", id);
+            this.resenaRepository.delete(resena);
+        });
+    }
+
+    public Resena actualizarResena(Integer id, Resena resena) {
+        Resena resenaBD = this.resenaRepository.findById(id).orElseThrow(() -> {
+            ResenaService.logger.error("No se encontro reseña con ID: {}", id);
+            return new RuntimeException("No se encontro reseña con ID: " + id);
+        });
+
+        ResenaService.logger.info("Actualizando reseña con ID {}", resena.getId());
+        Resena resenaUpdate = new Resena();
+        resenaUpdate.setId(resenaBD.getId());
+        resenaUpdate.setUsuarioComun(Objects.isNull(resena.getUsuarioComun()) ? resenaBD.getUsuarioComun() : resena.getUsuarioComun());
+        resenaUpdate.setCalificacion(Objects.isNull(resena.getCalificacion()) ? resenaBD.getCalificacion() : resena.getCalificacion());
+        resenaUpdate.setComentario(Objects.isNull(resena.getComentario()) ? resenaBD.getComentario() : resena.getComentario());
+        resenaUpdate.setFechaResena(LocalDateTime.now());
+        resenaUpdate.setTotal(Objects.isNull(resena.getTotal()) ? resenaBD.getTotal() : resena.getTotal());
+
+        return this.resenaRepository.save(resenaUpdate);
+    }
+
 } // class ResenaService
