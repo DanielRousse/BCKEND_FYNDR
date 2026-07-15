@@ -2,10 +2,12 @@ package org.generation.fyndr.modelos;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Clase que representa a un usuario trabajador en el sistema Fyndr.
@@ -86,6 +88,10 @@ public class UsuarioTrabajador {
 
     @Column(name = "fecha_registro", insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaRegistro;
+
+    @OneToMany(mappedBy = "usuarioTrabajador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Resena> resenas;
 
 
 
@@ -295,6 +301,14 @@ public class UsuarioTrabajador {
 
     public void setFechaRegistro(LocalDateTime fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
+    }
+
+    public List<Resena> getResenas() {
+        return resenas;
+    }
+
+    public void setResenas(List<Resena> resenas) {
+        this.resenas = resenas;
     }
 
     @Override

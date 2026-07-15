@@ -1,6 +1,7 @@
 package org.generation.fyndr.modelos;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.LocalDateTime;
 
 /**
@@ -16,9 +17,11 @@ public class Resena {
     private Integer id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario_comun")
+    @JsonBackReference
     private UsuarioComun usuarioComun;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario_trabajador")
+    @JsonBackReference
     private UsuarioTrabajador usuarioTrabajador;
     private Integer calificacion;
     private String comentario;
@@ -40,6 +43,14 @@ public class Resena {
 
     public void setUsuarioComun(UsuarioComun usuarioComun) {
         this.usuarioComun = usuarioComun;
+    }
+
+    public UsuarioTrabajador getUsuarioTrabajador() {
+        return usuarioTrabajador;
+    }
+
+    public void setUsuarioTrabajador(UsuarioTrabajador usuarioTrabajador) {
+        this.usuarioTrabajador = usuarioTrabajador;
     }
 
     public Integer getCalificacion() {

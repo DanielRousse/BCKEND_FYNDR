@@ -1,7 +1,9 @@
 package org.generation.fyndr.modelos;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Clase que representa a un usuario comun en el sistema Fyndr y mapea a la base de datos.
@@ -29,6 +31,10 @@ public class UsuarioComun {
 
     @Column(name = "fecha_registro", insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaRegistro;
+
+    @OneToMany(mappedBy = "usuarioComun", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Resena> resenas;
 
     public UsuarioComun() {
     } // UsuarioComun
@@ -84,6 +90,14 @@ public class UsuarioComun {
     public void setFechaRegistro(LocalDateTime fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     } // setFechaRegistro
+
+    public List<Resena> getResenas() {
+        return resenas;
+    } // getResenas
+
+    public void setResenas(List<Resena> resenas) {
+        this.resenas = resenas;
+    } // setResenas
 
     @Override
     public String toString() {
