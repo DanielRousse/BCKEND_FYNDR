@@ -25,36 +25,36 @@ public class PublicacionController {
     @GetMapping
     public List<Publicacion> getPublicaciones() {
         // GET http://localhost:8080/api/publicaciones/
-        return service.getEntidades();
+        return service.getPublicaciones();
     } // getPublicaciones
 
-    @GetMapping(path="{entidadId}")
-    public Publicacion getPublicacion(@PathVariable("entidadId") Long id) {
+    @GetMapping(path="{publicacionId}")
+    public Publicacion getPublicacion(@PathVariable("publicacionId") Long id) {
         // GET http://localhost:8080/api/publicaciones/1
-        return service.getEntidad(id);
+        return service.getPublicacion(id);
     } // getPublicacion
 
     @PostMapping
     public Publicacion crearPublicacion(@RequestBody Publicacion publicacion) {
         // POST http://localhost:8080/api/publicaciones/
-        return service.crearEntidad(publicacion);
+        return service.crearPublicacion(publicacion);
     } // crearPublicacion
 
-    @PutMapping(path="{entidadId}")
+    @PutMapping(path="{publicacionId}")
     public Publicacion actualizarPublicacion(
-            @PathVariable("entidadId") Long id,
+            @PathVariable("publicacionId") Long id,
             @RequestParam(required = false) String titulo,
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) Double precio,
             @RequestParam(required = false) Long idUsuarioTrabajador
     ) {
         // PUT http://localhost:8080/api/publicaciones/1
-        return service.actualizarEntidad(id, titulo, descripcion, precio, idUsuarioTrabajador);
+        return service.actualizarPublicacion(id, titulo, descripcion, precio, idUsuarioTrabajador);
     } // actualizarPublicacion
 
-    @DeleteMapping(path="{entidadId}")
-    public Publicacion eliminarPublicacion(@PathVariable("entidadId") Long id) {
+    @DeleteMapping(path="{publicacionId}")
+    public Publicacion eliminarPublicacion(@PathVariable("publicacionId") Long id) {
         // DELETE http://localhost:8080/api/publicaciones/1
-        return service.deleteEntidad(id);
+        return service.deletePublicacion(id);
     } // eliminarPublicacion
 } // class PublicacionController
