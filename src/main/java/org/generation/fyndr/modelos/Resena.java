@@ -1,87 +1,100 @@
 package org.generation.fyndr.modelos;
 
+import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.LocalDateTime;
 
 /**
  * Clase que representa a una resena en el sistema Fyndr.
  */
+@Entity
+@Table(name = "resenas")
 public class Resena {
 
-    private Long id;
-    private Long idUsuarioComun;
-    private Long idUsuarioTrabajador;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_resena")
+    private Integer id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_comun")
+    @JsonBackReference
+    private UsuarioComun usuarioComun;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_trabajador")
+    @JsonBackReference
+    private UsuarioTrabajador usuarioTrabajador;
     private Integer calificacion;
     private String comentario;
+    @Column(name = "fecha_resena")
     private LocalDateTime fechaResena;
+    private Long total = 0L;
 
-    private static Long total = 0L;
-
-    public Resena() {
-    } // Resena
-
-    public Resena(Long idUsuarioComun, Long idUsuarioTrabajador, Integer calificacion, String comentario, LocalDateTime fechaResena) {
-        total++;
-        this.id = total;
-        this.idUsuarioComun = idUsuarioComun;
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
-        this.calificacion = calificacion;
-        this.comentario = comentario;
-        this.fechaResena = fechaResena;
-    } // Resena
-
-    public Long getId() {
+    public Integer getId() {
         return id;
-    } // getId
+    }
 
-    public Long getIdUsuarioComun() {
-        return idUsuarioComun;
-    } // getIdUsuarioComun
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    public void setIdUsuarioComun(Long idUsuarioComun) {
-        this.idUsuarioComun = idUsuarioComun;
-    } // setIdUsuarioComun
+    public UsuarioComun getUsuarioComun() {
+        return usuarioComun;
+    }
 
-    public Long getIdUsuarioTrabajador() {
-        return idUsuarioTrabajador;
-    } // getIdUsuarioTrabajador
+    public void setUsuarioComun(UsuarioComun usuarioComun) {
+        this.usuarioComun = usuarioComun;
+    }
 
-    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) {
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
-    } // setIdUsuarioTrabajador
+    public UsuarioTrabajador getUsuarioTrabajador() {
+        return usuarioTrabajador;
+    }
+
+    public void setUsuarioTrabajador(UsuarioTrabajador usuarioTrabajador) {
+        this.usuarioTrabajador = usuarioTrabajador;
+    }
 
     public Integer getCalificacion() {
         return calificacion;
-    } // getCalificacion
+    }
 
     public void setCalificacion(Integer calificacion) {
         this.calificacion = calificacion;
-    } // setCalificacion
+    }
 
     public String getComentario() {
         return comentario;
-    } // getComentario
+    }
 
     public void setComentario(String comentario) {
         this.comentario = comentario;
-    } // setComentario
+    }
 
     public LocalDateTime getFechaResena() {
         return fechaResena;
-    } // getFechaResena
+    }
 
     public void setFechaResena(LocalDateTime fechaResena) {
         this.fechaResena = fechaResena;
-    } // setFechaResena
+    }
+
+    public Long getTotal() {
+        return total;
+    }
+
+    public void setTotal(Long total) {
+        this.total = total;
+    }
 
     @Override
     public String toString() {
-        return "Resena{" +
-                "id=" + id +
-                ", idUsuarioComun=" + idUsuarioComun +
-                ", idUsuarioTrabajador=" + idUsuarioTrabajador +
-                ", calificacion=" + calificacion +
-                ", comentario='" + comentario + '\'' +
-                ", fechaResena=" + fechaResena +
-                '}';
-    } // toString
-} // class Resena
+        final StringBuilder sb = new StringBuilder("Resena{");
+        sb.append("id=").append(id);
+        sb.append(", usuarioComun=").append(usuarioComun);
+        sb.append(", calificacion=").append(calificacion);
+        sb.append(", comentario='").append(comentario).append('\'');
+        sb.append(", fechaResena=").append(fechaResena);
+        sb.append(", total=").append(total);
+        sb.append('}');
+        return sb.toString();
+    }
+}

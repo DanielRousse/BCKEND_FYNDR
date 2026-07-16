@@ -1,35 +1,44 @@
 package org.generation.fyndr.modelos;
 
+import jakarta.persistence.*;
+
 /**
- * Clase que representa a una profesion en el sistema Fyndr.
+ * Clase que representa una profesión en el sistema Fyndr.
  */
+@Entity
+@Table(name = "profesiones")
 public class Profesion {
 
+    // Llave primaria de la tabla.
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_profesion")
     private Long id;
+
+    // Nombre de la profesión.
+    @Column(name = "nombre_profesion", nullable = false, unique = true)
     private String nombreProfesion;
 
-    private static Long total = 0L;
-
+    // Constructor vacío requerido por JPA.
     public Profesion() {
-    } // Profesion
+    }
 
+    // Constructor con parámetros.
     public Profesion(String nombreProfesion) {
-        total++;
-        this.id = total;
         this.nombreProfesion = nombreProfesion;
-    } // Profesion
+    }
 
     public Long getId() {
         return id;
-    } // getId
+    }
 
     public String getNombreProfesion() {
         return nombreProfesion;
-    } // getNombreProfesion
+    }
 
     public void setNombreProfesion(String nombreProfesion) {
         this.nombreProfesion = nombreProfesion;
-    } // setNombreProfesion
+    }
 
     @Override
     public String toString() {
@@ -37,5 +46,5 @@ public class Profesion {
                 "id=" + id +
                 ", nombreProfesion='" + nombreProfesion + '\'' +
                 '}';
-    } // toString
-} // class Profesion
+    }
+}

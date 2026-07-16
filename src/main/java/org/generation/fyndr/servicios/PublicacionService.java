@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Servicio para gestionar las publicaciones usando persistencia JPA.
+ * Servicio para gestionar las operaciones de las publicaciones en base de datos.
  */
 @Service
 public class PublicacionService {

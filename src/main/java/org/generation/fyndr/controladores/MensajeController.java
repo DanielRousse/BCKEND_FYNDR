@@ -3,16 +3,13 @@ package org.generation.fyndr.controladores;
 import org.generation.fyndr.modelos.Mensaje;
 import org.generation.fyndr.servicios.MensajeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Controlador REST para gestionar peticiones relacionadas con mensajes.
- */
 @RestController
 @RequestMapping(path="/api/mensajes/")
-@CrossOrigin(origins = "*")
 public class MensajeController {
 
     private final MensajeService service;
@@ -20,41 +17,48 @@ public class MensajeController {
     @Autowired
     public MensajeController(MensajeService service) {
         this.service = service;
-    } // MensajeController
+    }
 
+    // get http://localhost:8080/api/mensajes/
     @GetMapping
     public List<Mensaje> getMensajes() {
-        // GET http://localhost:8080/api/mensajes/
-        return service.getEntidades();
-    } // getMensajes
+        return service.todosLosMensajes();
+    }
 
-    @GetMapping(path="{entidadId}")
-    public Mensaje getMensaje(@PathVariable("entidadId") Long id) {
-        // GET http://localhost:8080/api/mensajes/1
-        return service.getEntidad(id);
-    } // getMensaje
+    // get http://localhost:8080/api/mensajes/1
+    @GetMapping(path="/{entidadId}")
+    public ResponseEntity<Mensaje> getMensaje(@PathVariable("entidadId") Long id) {
+        return service.mensajesPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
+    //  post http://localhost:8080/api/mensajes/
     @PostMapping
     public Mensaje crearMensaje(@RequestBody Mensaje mensaje) {
-        // POST http://localhost:8080/api/mensajes/
-        return service.crearEntidad(mensaje);
-    } // crearMensaje
+        return service.crearMensaje(mensaje);
+    }
 
-    @PutMapping(path="{entidadId}")
-    public Mensaje actualizarMensaje(
+    //  put http://localhost:8080/api/mensajes/1
+    @PutMapping(path="/{entidadId}")
+    public ResponseEntity<Mensaje> actualizarMensaje(
             @PathVariable("entidadId") Long id,
-            @RequestParam(required = false) Long idUsuarioComun,
-            @RequestParam(required = false) Long idUsuarioTrabajador,
-            @RequestParam(required = false) String remitente,
-            @RequestParam(required = false) String contenido
-    ) {
-        // PUT http://localhost:8080/api/mensajes/1
-        return service.actualizarEntidad(id, idUsuarioComun, idUsuarioTrabajador, remitente, contenido);
-    } // actualizarMensaje
+            @RequestBody Mensaje datosActualizados) {
+        try {
+            return ResponseEntity.ok(service.actualizarMensaje(id, datosActualizados));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-    @DeleteMapping(path="{entidadId}")
-    public Mensaje eliminarMensaje(@PathVariable("entidadId") Long id) {
-        // DELETE http://localhost:8080/api/mensajes/1
-        return service.deleteEntidad(id);
-    } // eliminarMensaje
-} // class MensajeController
+    // delete http://localhost:8080/api/mensajes/1
+    @DeleteMapping(path="/{entidadId}")
+    public ResponseEntity<Void> eliminarMensaje(@PathVariable("entidadId") Long id) {
+        try {
+            service.eliminarMensaje(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}

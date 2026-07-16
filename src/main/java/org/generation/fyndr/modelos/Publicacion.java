@@ -1,5 +1,6 @@
 package org.generation.fyndr.modelos;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -26,7 +27,7 @@ public class Publicacion {
     @Column(name = "titulo", nullable = false)
     private String titulo;
 
-    @Column(name = "descripcion", nullable = false)
+    @Column(name = "descripcion", nullable = false, length = 1000)
     private String descripcion;
 
     @Column(name = "precio", nullable = false)
@@ -54,6 +55,10 @@ public class Publicacion {
     public Long getId() {
         return id;
     } // getId
+
+    public void setId(Long id) {
+        this.id = id;
+    } // setId
 
     public String getTitulo() {
         return titulo;

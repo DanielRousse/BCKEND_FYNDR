@@ -12,7 +12,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(path="/api/profesiones/")
-@CrossOrigin(origins = "*")
 public class ProfesionController {
 
     private final ProfesionService service;
