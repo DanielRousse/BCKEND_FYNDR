@@ -1,67 +1,54 @@
 package org.generation.fyndr.modelos;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * Clase que representa una contratacion en el sistema Fyndr.
- */
+@Entity
+@Table(name = "contrataciones")
 public class Contratacion {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "id_usuario_comun", nullable = false)
     private Long idUsuarioComun;
+
+    @Column(name = "id_usuario_trabajador", nullable = false)
     private Long idUsuarioTrabajador;
+
+    @Column(name = "fecha_contratacion", nullable = false)
     private LocalDateTime fechaContratacion;
+
+    @Column(name = "estado", nullable = false)
     private String estado;
 
-    private static Long total = 0L;
+    // Constructor vacío
+    public Contratacion() {}
 
-    public Contratacion() {
-    } // Contratacion
-
+    // Constructor completo adaptado (sin el contador manual obsoleto)
     public Contratacion(Long idUsuarioComun, Long idUsuarioTrabajador, LocalDateTime fechaContratacion, String estado) {
-        total++;
-        this.id = total;
         this.idUsuarioComun = idUsuarioComun;
         this.idUsuarioTrabajador = idUsuarioTrabajador;
         this.fechaContratacion = fechaContratacion;
         this.estado = estado;
-    } // Contratacion
+    }
 
-    public Long getId() {
-        return id;
-    } // getId
 
-    public Long getIdUsuarioComun() {
-        return idUsuarioComun;
-    } // getIdUsuarioComun
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setIdUsuarioComun(Long idUsuarioComun) {
-        this.idUsuarioComun = idUsuarioComun;
-    } // setIdUsuarioComun
+    public Long getIdUsuarioComun() { return idUsuarioComun; }
+    public void setIdUsuarioComun(Long idUsuarioComun) { this.idUsuarioComun = idUsuarioComun; }
 
-    public Long getIdUsuarioTrabajador() {
-        return idUsuarioTrabajador;
-    } // getIdUsuarioTrabajador
+    public Long getIdUsuarioTrabajador() { return idUsuarioTrabajador; }
+    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) { this.idUsuarioTrabajador = idUsuarioTrabajador; }
 
-    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) {
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
-    } // setIdUsuarioTrabajador
+    public LocalDateTime getFechaContratacion() { return fechaContratacion; }
+    public void setFechaContratacion(LocalDateTime fechaContratacion) { this.fechaContratacion = fechaContratacion; }
 
-    public LocalDateTime getFechaContratacion() {
-        return fechaContratacion;
-    } // getFechaContratacion
-
-    public void setFechaContratacion(LocalDateTime fechaContratacion) {
-        this.fechaContratacion = fechaContratacion;
-    } // setFechaContratacion
-
-    public String getEstado() {
-        return estado;
-    } // getEstado
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    } // setEstado
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 
     @Override
     public String toString() {
@@ -72,5 +59,5 @@ public class Contratacion {
                 ", fechaContratacion=" + fechaContratacion +
                 ", estado='" + estado + '\'' +
                 '}';
-    } // toString
-} // class Contratacion
+    }
+}

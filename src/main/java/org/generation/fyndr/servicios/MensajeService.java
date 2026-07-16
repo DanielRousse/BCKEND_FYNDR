@@ -1,75 +1,63 @@
 package org.generation.fyndr.servicios;
 
 import org.generation.fyndr.modelos.Mensaje;
+import org.generation.fyndr.repositorios.MensajeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-/**
- * Servicio para gestionar las operaciones de los mensajes en memoria local.
- */
 @Service
 public class MensajeService {
 
-    private final ArrayList<Mensaje> lista = new ArrayList<>();
+    @Autowired
+    private MensajeRepository mensajeRepository;
 
-    public MensajeService() {
-        lista.add(new Mensaje(1L, 1L, "Comun", "Hola, me interesa tu servicio de plomeria.", LocalDateTime.now()));
-        lista.add(new Mensaje(1L, 1L, "Trabajador", "Hola, claro, cuando te gustaria programar la cita?", LocalDateTime.now()));
-    } // MensajeService
+    // se crear  un mensaje en la base de datos
+    public Mensaje crearMensaje(Mensaje mensaje) {
+        return mensajeRepository.save(mensaje);
+    }
 
-    public ArrayList<Mensaje> getEntidades() {
-        return lista;
-    } // getEntidades
+    // obtenemos todos los mensajes reales de sql
+    public List<Mensaje> todosLosMensajes() {
+        return mensajeRepository.findAll();
+    }
 
-    public Mensaje getEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            Mensaje m = lista.get(i);
-            if (m.getId().equals(id)) {
-                return m;
-            } // if
-        } // for
-        return null;
-    } // getEntidad
+    // buscamos  un mensaje específico por su el id
+    public Optional<Mensaje> mensajesPorId(Long id) {
+        return mensajeRepository.findById(id);
+    }
 
-    public Mensaje crearEntidad(Mensaje obj) {
-        Mensaje nuevo = new Mensaje(obj.getIdUsuarioComun(), obj.getIdUsuarioTrabajador(), obj.getRemitente(), obj.getContenido(), LocalDateTime.now());
-        lista.add(nuevo);
-        return nuevo;
-    } // crearEntidad
+    // filtramos mensajes de un usuario comun
+    public List<Mensaje> mensajesPorUsuarioComun(Long idUsuarioComun) {
+        return mensajeRepository.findAll().stream()
+                .filter(m -> m.getIdUsuarioComun().equals(idUsuarioComun))
+                .collect(Collectors.toList());
+    }
 
-    public Mensaje deleteEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            Mensaje m = lista.get(i);
-            if (m.getId().equals(id)) {
-                Mensaje ref = m;
-                lista.remove(i);
-                return ref;
-            } // if
-        } // for
-        return null;
-    } // deleteEntidad
+    // filtramos para Usuario Trabajador
+    public List<Mensaje> mensajesPorUsuarioTrabajador(Long idUsuarioTrabajador) {
+        return mensajeRepository.findAll().stream()
+                .filter(m -> m.getIdUsuarioTrabajador().equals(idUsuarioTrabajador))
+                .collect(Collectors.toList());
+    }
 
-    public Mensaje actualizarEntidad(Long id, Long idUsuarioComun, Long idUsuarioTrabajador, String remitente, String contenido) {
-        for (int i = 0; i < lista.size(); i++) {
-            Mensaje m = lista.get(i);
-            if (m.getId().equals(id)) {
-                if (idUsuarioComun != null) {
-                    m.setIdUsuarioComun(idUsuarioComun);
-                } // if
-                if (idUsuarioTrabajador != null) {
-                    m.setIdUsuarioTrabajador(idUsuarioTrabajador);
-                } // if
-                if (remitente != null) {
-                    m.setRemitente(remitente);
-                } // if
-                if (contenido != null) {
-                    m.setContenido(contenido);
-                } // if
-                return m;
-            } // if
-        } // for
-        return null;
-    } // actualizarEntidad
-} // class MensajeService
+    // elimina mensaje
+    public void eliminarMensaje(Long id) {
+        mensajeRepository.deleteById(id);
+    }
+
+    // actualiza mensaje
+    public Mensaje actualizarMensaje(Long id, Mensaje datosActualizados) {
+        return mensajeRepository.findById(id).map(mensaje -> {
+            mensaje.setIdUsuarioComun(datosActualizados.getIdUsuarioComun());
+            mensaje.setIdUsuarioTrabajador(datosActualizados.getIdUsuarioTrabajador());
+            mensaje.setRemitente(datosActualizados.getRemitente());
+            mensaje.setContenido(datosActualizados.getContenido());
+            mensaje.setFechaEnvio(datosActualizados.getFechaEnvio());
+            return mensajeRepository.save(mensaje);
+        }).orElseThrow(() -> new RuntimeException("Mensaje no encontrado con id: " + id));
+    }
+}
