@@ -3,6 +3,15 @@ package org.generation.fyndr.modelos;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
 /**
  * Clase que representa a una publicacion en el sistema Fyndr.
  */
@@ -12,6 +21,7 @@ public class Publicacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "publicacionId", unique = true, nullable = false)
     private Long id;
 
     @Column(name = "titulo", nullable = false)
@@ -26,18 +36,20 @@ public class Publicacion {
     @Column(name = "fecha_publicacion", nullable = false)
     private LocalDateTime fechaPublicacion;
 
-    @Column(name = "id_usuario_trabajador", nullable = false)
-    private Long idUsuarioTrabajador;
+    @ManyToOne
+    @JoinColumn(name = "id_usuario_trabajador", nullable = false)
+    private UsuarioTrabajador usuarioTrabajador;
+
 
     public Publicacion() {
     } // Publicacion
 
-    public Publicacion(String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, Long idUsuarioTrabajador) {
+    public Publicacion(String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, UsuarioTrabajador usuarioTrabajador) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.precio = precio;
         this.fechaPublicacion = fechaPublicacion;
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
+        this.usuarioTrabajador = usuarioTrabajador;
     } // Publicacion
 
     public Long getId() {
@@ -80,13 +92,13 @@ public class Publicacion {
         this.fechaPublicacion = fechaPublicacion;
     } // setFechaPublicacion
 
-    public Long getIdUsuarioTrabajador() {
-        return idUsuarioTrabajador;
-    } // getIdUsuarioTrabajador
+    public UsuarioTrabajador getUsuarioTrabajador() {
+        return usuarioTrabajador;
+    } //get usuariotrabajadoID
 
-    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) {
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
-    } // setIdUsuarioTrabajador
+    public void setUsuarioTrabajador(UsuarioTrabajador usuarioTrabajador) {
+        this.usuarioTrabajador = usuarioTrabajador;
+    }//set usuariotrabajadoID
 
     @Override
     public String toString() {
@@ -96,7 +108,7 @@ public class Publicacion {
                 ", descripcion='" + descripcion + '\'' +
                 ", precio=" + precio +
                 ", fechaPublicacion=" + fechaPublicacion +
-                ", idUsuarioTrabajador=" + idUsuarioTrabajador +
+                ", usuarioTrabajador=" + usuarioTrabajador +
                 '}';
     } // toString
 } // class Publicacion
