@@ -1,7 +1,10 @@
 package org.generation.fyndr.repositorios;
 
-/**
- * Interfaz de repositorio para la entidad Contratacion.
- */
-public interface ContratacionRepository {
-} // interface ContratacionRepository
+import org.generation.fyndr.modelos.Contratacion;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ContratacionRepository extends JpaRepository<Contratacion, Long> {
+
+}

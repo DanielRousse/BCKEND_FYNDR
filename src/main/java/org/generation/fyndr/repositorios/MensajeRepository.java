@@ -1,7 +1,10 @@
 package org.generation.fyndr.repositorios;
 
-/**
- * Interfaz de repositorio para la entidad Mensaje.
- */
-public interface MensajeRepository {
-} // interface MensajeRepository
+import org.generation.fyndr.modelos.Mensaje;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
+
+}

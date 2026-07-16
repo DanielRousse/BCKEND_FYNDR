@@ -1,77 +1,61 @@
 package org.generation.fyndr.modelos;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * Clase que representa un mensaje en el sistema Fyndr.
- */
+@Entity
+@Table(name = "mensajes")
 public class Mensaje {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "id_usuario_comun", nullable = false)
     private Long idUsuarioComun;
+
+    @Column(name = "id_usuario_trabajador", nullable = false)
     private Long idUsuarioTrabajador;
+
+    @Column(name = "remitente", nullable = false)
     private String remitente;
+
+    @Column(name = "contenido", nullable = false, length = 500)
     private String contenido;
+
+    @Column(name = "fecha_envio", nullable = false)
     private LocalDateTime fechaEnvio;
 
-    private static Long total = 0L;
+    // Constructor vacío obligatorio
+    public Mensaje() {}
 
-    public Mensaje() {
-    } // Mensaje
-
+    // Constructor completo adaptado
     public Mensaje(Long idUsuarioComun, Long idUsuarioTrabajador, String remitente, String contenido, LocalDateTime fechaEnvio) {
-        total++;
-        this.id = total;
         this.idUsuarioComun = idUsuarioComun;
         this.idUsuarioTrabajador = idUsuarioTrabajador;
         this.remitente = remitente;
         this.contenido = contenido;
         this.fechaEnvio = fechaEnvio;
-    } // Mensaje
+    }
 
-    public Long getId() {
-        return id;
-    } // getId
+    // getters y setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getIdUsuarioComun() {
-        return idUsuarioComun;
-    } // getIdUsuarioComun
+    public Long getIdUsuarioComun() { return idUsuarioComun; }
+    public void setIdUsuarioComun(Long idUsuarioComun) { this.idUsuarioComun = idUsuarioComun; }
 
-    public void setIdUsuarioComun(Long idUsuarioComun) {
-        this.idUsuarioComun = idUsuarioComun;
-    } // setIdUsuarioComun
+    public Long getIdUsuarioTrabajador() { return idUsuarioTrabajador; }
+    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) { this.idUsuarioTrabajador = idUsuarioTrabajador; }
 
-    public Long getIdUsuarioTrabajador() {
-        return idUsuarioTrabajador;
-    } // getIdUsuarioTrabajador
+    public String getRemitente() { return remitente; }
+    public void setRemitente(String remitente) { this.remitente = remitente; }
 
-    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) {
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
-    } // setIdUsuarioTrabajador
+    public String getContenido() { return contenido; }
+    public void setContenido(String contenido) { this.contenido = contenido; }
 
-    public String getRemitente() {
-        return remitente;
-    } // getRemitente
-
-    public void setRemitente(String remitente) {
-        this.remitente = remitente;
-    } // setRemitente
-
-    public String getContenido() {
-        return contenido;
-    } // getContenido
-
-    public void setContenido(String contenido) {
-        this.contenido = contenido;
-    } // setContenido
-
-    public LocalDateTime getFechaEnvio() {
-        return fechaEnvio;
-    } // getFechaEnvio
-
-    public void setFechaEnvio(LocalDateTime fechaEnvio) {
-        this.fechaEnvio = fechaEnvio;
-    } // setFechaEnvio
+    public LocalDateTime getFechaEnvio() { return fechaEnvio; }
+    public void setFechaEnvio(LocalDateTime fechaEnvio) { this.fechaEnvio = fechaEnvio; }
 
     @Override
     public String toString() {
@@ -83,5 +67,5 @@ public class Mensaje {
                 ", contenido='" + contenido + '\'' +
                 ", fechaEnvio=" + fechaEnvio +
                 '}';
-    } // toString
-} // class Mensaje
+    }
+}
