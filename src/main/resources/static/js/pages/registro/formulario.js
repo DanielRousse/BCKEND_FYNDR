@@ -368,36 +368,57 @@ export function initFormulario() {
             const userModel = {
                 nombre: nameInput.value.trim(),
                 telefono: phoneInput.value.replace(/[\s\-\(\)]/g, ''),
-                email: btoa(emailInput.value.trim()),
-                contrasena: btoa(passwordInput.value)
+                email: emailInput.value.trim(),
+                contrasena: passwordInput.value
             };
-            const jsonString = JSON.stringify(userModel, null, 2);
-            localStorage.setItem('registeredUser', jsonString);
-            
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            registeredUsers.push(userModel);
-            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers, null, 2));
 
-            console.log(jsonString);
+            // Registrar usuario común mediante fetch al backend
+            fetch('/api/usuarios-comunes/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userModel)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al registrar usuario');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>¡Registro exitoso!</strong> Tu cuenta ha sido creada correctamente.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                form.reset();
+                nameInput.classList.remove('is-valid');
+                phoneInput.classList.remove('is-valid');
+                emailInput.classList.remove('is-valid');
+                passwordInput.classList.remove('is-valid');
+                confirmPasswordInput.classList.remove('is-valid');
+                passwordInput.setAttribute('type', 'password');
+                confirmPasswordInput.setAttribute('type', 'password');
+                togglePassword.classList.add('bi-eye-slash');
+                togglePassword.classList.remove('bi-eye');
+                toggleConfirmPassword.classList.add('bi-eye-slash');
+                toggleConfirmPassword.classList.remove('bi-eye');
 
-            alertContainer.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>¡Registro exitoso!</strong> Tu cuenta ha sido creada correctamente.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            `;
-            form.reset();
-            nameInput.classList.remove('is-valid');
-            phoneInput.classList.remove('is-valid');
-            emailInput.classList.remove('is-valid');
-            passwordInput.classList.remove('is-valid');
-            confirmPasswordInput.classList.remove('is-valid');
-            passwordInput.setAttribute('type', 'password');
-            confirmPasswordInput.setAttribute('type', 'password');
-            togglePassword.classList.add('bi-eye-slash');
-            togglePassword.classList.remove('bi-eye');
-            toggleConfirmPassword.classList.add('bi-eye-slash');
-            toggleConfirmPassword.classList.remove('bi-eye');
+                // Redirigir a login para iniciar sesión
+                setTimeout(() => {
+                    window.location.hash = '#login';
+                }, 1500);
+            })
+            .catch(error => {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        Ocurrió un error al registrar tu cuenta. El correo electrónico podría estar en uso.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+            });
         } else {
             alertContainer.innerHTML = `
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">

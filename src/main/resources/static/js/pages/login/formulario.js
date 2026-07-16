@@ -143,14 +143,12 @@ export function initLogin() {
         });
     }
 
-    
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const emailVal = emailInput.value.trim();
         const passwordVal = passwordInput.value;
 
-        
         if (!emailVal || !passwordVal) {
             alertContainer.innerHTML = `
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -161,70 +159,52 @@ export function initLogin() {
             return;
         }
 
-       
-        const encodedEmail = btoa(emailVal);
-        const encodedPassword = btoa(passwordVal);
-
-     
-        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        const registeredUsersProfesional = JSON.parse(localStorage.getItem("registeredUsersProfesional")) || [];
-        
-        
-        const userFound = registeredUsers.find(user => 
-            user.email === encodedEmail && user.contrasena === encodedPassword
-        );
-
-        const userProFound = registeredUsersProfesional.find(user =>
-            user.correo === encodedEmail && user.password ===encodedPassword
-        );
-
         const redirigirAInicio = () => {
             setTimeout(() => {
-                
                 window.location.hash = '#inicio'; 
             }, 1500); 
         };
 
-        if (userFound) {
+        // Enviar credenciales al backend mediante fetch con ruta relativa
+        fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: emailVal,
+                contrasena: passwordVal
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Credenciales incorrectas');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // data contiene: accessToken, nombre, email
+            localStorage.setItem('token', data.accessToken);
             
-            const activeUser = { nombre: userFound.nombre, email: emailVal };
+            const activeUser = { nombre: data.nombre, email: data.email };
             localStorage.setItem('currentUser', JSON.stringify(activeUser));
 
             alertContainer.innerHTML = `
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>¡Bienvenido de nuevo, ${userFound.nombre}!</strong> Has iniciado sesión correctamente.
+                    <strong>¡Bienvenido de nuevo, ${data.nombre}!</strong> Has iniciado sesión correctamente.
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             `;
-            
-         
             form.reset();
-            redirigirAInicio(); 
-        } else {
-
-            if(userProFound){
-                const activeUser = { nombre: userProFound.nombre, email: emailVal };
-                localStorage.setItem('currentUser', JSON.stringify(activeUser));
-
-                alertContainer.innerHTML = `
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>¡Bienvenido de nuevo, ${userProFound.nombre}!</strong> Has iniciado sesión correctamente.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                `;
-
-                form.reset(); 
-                redirigirAInicio(); 
-            }else{
-               
+            redirigirAInicio();
+        })
+        .catch(error => {
             alertContainer.innerHTML = `
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     Correo electrónico o contraseña incorrectos.
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             `;
-            }
-            
-        }
+        });
     });
 }

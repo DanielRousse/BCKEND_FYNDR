@@ -1,75 +1,66 @@
 package org.generation.fyndr.servicios;
 
 import org.generation.fyndr.modelos.Publicacion;
+import org.generation.fyndr.repositorios.PublicacionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Servicio para gestionar las operaciones de las publicaciones en memoria local.
+ * Servicio para gestionar las operaciones de las publicaciones en base de datos.
  */
 @Service
 public class PublicacionService {
 
-    private final ArrayList<Publicacion> lista = new ArrayList<>();
+    private final PublicacionRepository publicacionRepository;
 
-    public PublicacionService() {
-        lista.add(new Publicacion("Instalacion de lavabo completo", "Incluye conexion de mangueras y mezcladora nueva.", 450.0, LocalDateTime.now(), 1L));
-        lista.add(new Publicacion("Cableado electrico residencial", "Cableado completo de habitacion con materiales premium.", 1500.0, LocalDateTime.now(), 2L));
+    @Autowired
+    public PublicacionService(PublicacionRepository publicacionRepository) {
+        this.publicacionRepository = publicacionRepository;
     } // PublicacionService
 
-    public ArrayList<Publicacion> getEntidades() {
-        return lista;
+    public List<Publicacion> getEntidades() {
+        return publicacionRepository.findAll();
     } // getEntidades
 
     public Publicacion getEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            Publicacion p = lista.get(i);
-            if (p.getId().equals(id)) {
-                return p;
-            } // if
-        } // for
-        return null;
+        return publicacionRepository.findById(id).orElse(null);
     } // getEntidad
 
     public Publicacion crearEntidad(Publicacion obj) {
-        Publicacion nuevo = new Publicacion(obj.getTitulo(), obj.getDescripcion(), obj.getPrecio(), LocalDateTime.now(), obj.getIdUsuarioTrabajador());
-        lista.add(nuevo);
-        return nuevo;
+        if (obj.getFechaPublicacion() == null) {
+            obj.setFechaPublicacion(LocalDateTime.now());
+        }
+        return publicacionRepository.save(obj);
     } // crearEntidad
 
     public Publicacion deleteEntidad(Long id) {
-        for (int i = 0; i < lista.size(); i++) {
-            Publicacion p = lista.get(i);
-            if (p.getId().equals(id)) {
-                Publicacion ref = p;
-                lista.remove(i);
-                return ref;
-            } // if
-        } // for
-        return null;
+        Publicacion p = getEntidad(id);
+        if (p != null) {
+            publicacionRepository.deleteById(id);
+        }
+        return p;
     } // deleteEntidad
 
     public Publicacion actualizarEntidad(Long id, String titulo, String descripcion, Double precio, Long idUsuarioTrabajador) {
-        for (int i = 0; i < lista.size(); i++) {
-            Publicacion p = lista.get(i);
-            if (p.getId().equals(id)) {
-                if (titulo != null) {
-                    p.setTitulo(titulo);
-                } // if
-                if (descripcion != null) {
-                    p.setDescripcion(descripcion);
-                } // if
-                if (precio != null) {
-                    p.setPrecio(precio);
-                } // if
-                if (idUsuarioTrabajador != null) {
-                    p.setIdUsuarioTrabajador(idUsuarioTrabajador);
-                } // if
-                return p;
+        Publicacion p = getEntidad(id);
+        if (p != null) {
+            if (titulo != null) {
+                p.setTitulo(titulo);
             } // if
-        } // for
+            if (descripcion != null) {
+                p.setDescripcion(descripcion);
+            } // if
+            if (precio != null) {
+                p.setPrecio(precio);
+            } // if
+            if (idUsuarioTrabajador != null) {
+                p.setIdUsuarioTrabajador(idUsuarioTrabajador);
+            } // if
+            return publicacionRepository.save(p);
+        } // if
         return null;
     } // actualizarEntidad
 } // class PublicacionService

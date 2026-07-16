@@ -16,7 +16,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(path="/api/resenas/")
-@CrossOrigin(origins = "*")
 public class ResenaController {
 
 

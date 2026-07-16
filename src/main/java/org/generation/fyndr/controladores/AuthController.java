@@ -20,7 +20,6 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping(path="/api/login")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final UsuarioComunRepository usuarioComunRepository;
@@ -50,7 +49,7 @@ public class AuthController {
             UsuarioComun usuarioComun = usuarioComunOpt.get();
             if (passwordEncoder.matches(loginDto.getContrasena(), usuarioComun.getContrasena())) {
                 String token = jwtUtil.generateToken(usuarioComun.getEmail());
-                return ResponseEntity.ok(new TokenDTO(token));
+                return ResponseEntity.ok(new TokenDTO(token, usuarioComun.getNombre(), usuarioComun.getEmail()));
             } // if matches
         } // if usuarioComun
 
@@ -60,7 +59,7 @@ public class AuthController {
             UsuarioTrabajador usuarioTrabajador = usuarioTrabajadorOpt.get();
             if (passwordEncoder.matches(loginDto.getContrasena(), usuarioTrabajador.getContrasena())) {
                 String token = jwtUtil.generateToken(usuarioTrabajador.getEmail());
-                return ResponseEntity.ok(new TokenDTO(token));
+                return ResponseEntity.ok(new TokenDTO(token, usuarioTrabajador.getNombre(), usuarioTrabajador.getEmail()));
             } // if matches
         } // if usuarioTrabajador
 

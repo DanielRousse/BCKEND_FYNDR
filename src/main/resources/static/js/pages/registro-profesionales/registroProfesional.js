@@ -517,48 +517,87 @@ else if (/^[2-9]0{9}$/.test(telefono)) {
     window.registroProfesionalState.pasoActual = pasoActual;
     renderPaso();
 } else {
-    const usuariosExistentes = JSON.parse(localStorage.getItem("registeredUsersProfesional")) || [];
-    const nuevoProfesional = { ...window.registroProfesionalState.datos };
-    nuevoProfesional.correo = btoa(nuevoProfesional.correo || "");
-    nuevoProfesional.password = btoa(nuevoProfesional.password || "");
-    delete nuevoProfesional.fotografiaFile;
-    usuariosExistentes.push(nuevoProfesional);
-    localStorage.setItem("registeredUsersProfesional", JSON.stringify(usuariosExistentes));
+    // Preparar objeto para enviar al backend
+    const stateDatos = window.registroProfesionalState.datos;
+    const nuevoTrabajador = {
+        nombre: stateDatos.nombre,
+        email: stateDatos.correo,
+        contrasena: stateDatos.password,
+        telefono: stateDatos.telefono,
+        fechaNacimiento: stateDatos.fechaNacimiento,
+        inePath: stateDatos.ine || "",
+        curp: stateDatos.curp || "",
+        fotografiaPath: stateDatos.fotografia || "",
+        comprobantePath: stateDatos.comprobante || "",
+        antecedentesPath: stateDatos.antecedentes || "",
+        experienciaAnos: parseInt(stateDatos.experiencia) || 0,
+        descripcion: stateDatos.descripcion || "",
+        subespecialidades: Array.isArray(stateDatos.subespecialidades) ? stateDatos.subespecialidades.join(", ") : "",
+        certificacionesPath: stateDatos.certificaciones || "",
+        portafolioPath: stateDatos.portafolio || "",
+        rfc: stateDatos.rfc || "",
+        clabe: stateDatos.clabe || "",
+        banco: stateDatos.banco || "",
+        tarifaHora: 0.0,
+        calificacionPromedio: 0.0
+    };
 
-    const usuarioJSON = JSON.stringify(window.registroProfesionalState.datos);
+    fetch('/api/usuarios-trabajadores/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(nuevoTrabajador)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al registrar profesional');
+        }
+        return response.json();
+    })
+    .then(data => {
+        Swal.fire({
+            icon: "success",
+            title: "Registro completado",
+            text: "Tu registro como profesional ha sido enviado y guardado correctamente."
+        }).then(() => {
+            // resetear estado
+            window.registroProfesionalState = {
+                pasoActual: 1,
+                datos: {
+                    nombre: "",
+                    correo: "",
+                    password: "",
+                    telefono: "",
+                    fechaNacimiento: ""
+                }
+            };
 
-    console.log(usuarioJSON);
+            // limpiar localStorage
+            localStorage.setItem(
+                "registroProfesionalState",
+                JSON.stringify(window.registroProfesionalState)
+            );
 
-    Swal.fire({
-        icon: "success",
-        title: "Registro completado",
-        text: "Todo fue enviado correctamente"
-    }).then(() => {
+            // reset variables locales
+            pasoActual = 1;
+            datosRegistro = window.registroProfesionalState.datos;
 
-        // 🔥 resetear estado
-        window.registroProfesionalState = {
-            pasoActual: 1,
-            datos: {
-                nombre: "",
-                correo: "",
-                password: "",
-                telefono: "",
-                fechaNacimiento: ""
-            }
-        };
-
-        // limpiar localStorage
-        localStorage.setItem(
-            "registroProfesionalState",
-            JSON.stringify(window.registroProfesionalState)
-        );
-
-        // reset variables locales
-        pasoActual = 1;
-        datosRegistro = window.registroProfesionalState.datos;
-
-        // volver a renderizar paso 1
-        renderPaso();
+            // volver a renderizar paso 1
+            renderPaso();
+            
+            // Redirigir a login
+            setTimeout(() => {
+                window.location.hash = '#login';
+            }, 1000);
+        });
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: "error",
+            title: "Error de registro",
+            text: "Hubo un problema al guardar tus datos de profesional. El correo podría estar registrado."
+        });
     });
 }
             }

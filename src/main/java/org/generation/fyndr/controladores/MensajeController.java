@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path="/api/mensajes/")
-@CrossOrigin(origins = "*")
 public class MensajeController {
 
     private final MensajeService service;

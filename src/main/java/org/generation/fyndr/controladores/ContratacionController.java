@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path="/api/contrataciones/")
-@CrossOrigin(origins = "*")
 public class ContratacionController {
 
     private final ContratacionService service;
@@ -28,7 +27,7 @@ public class ContratacionController {
     //get http://localhost:8080/api/contrataciones/1
     @GetMapping(path="/{entidadId}")
     public Contratacion getContratacion(@PathVariable("entidadId") Long id) {
-        return service.getEntid(id);
+        return service.getEntidad(id);
     }
 
     //post http://localhost:8080/api/contrataciones/
