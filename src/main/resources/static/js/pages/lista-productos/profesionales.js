@@ -1,29 +1,8 @@
-const profesionalesData = [
-    { id: 1, nombre: "Juan Perez", servicio: "Plomería", calificacion: 4.9, resenas: 124, precio: 350, img: "./assets/juan.svg" },
-    { id: 2, nombre: "Carlos Ramirez", servicio: "Electricidad", calificacion: 4.8, resenas: 98, precio: 400, img: "./assets/carlos.svg" },
-    { id: 3, nombre: "Miguelina Torres", servicio: "Carpintería", calificacion: 4.9, resenas: 156, precio: 500, img: "./assets/miguelina.svg" },
-    { id: 4, nombre: "Maria Lopez", servicio: "Limpieza", calificacion: 4.7, resenas: 86, precio: 300, img: "./assets/maria.svg" },
-    { id: 5, nombre: "Luis Hernandez", servicio: "Pintura", calificacion: 4.8, resenas: 112, precio: 450, img: "./assets/luis.svg" },
-    { id: 6, nombre: "Fernando Garcia", servicio: "Jardinería", calificacion: 4.6, resenas: 75, precio: 350, img: "./assets/fernando.svg" },
-    { id: 7, nombre: "Roberto Gómez", servicio: "Plomería", calificacion: 4.5, resenas: 42, precio: 320, img: "./assets/roberto.svg" },
-    { id: 8, nombre: "Alicia Díaz", servicio: "Electricidad", calificacion: 4.9, resenas: 110, precio: 420, img: "./assets/alicia.svg" },
-    { id: 9, nombre: "Sonia Martínez", servicio: "Limpieza", calificacion: 4.8, resenas: 65, precio: 280, img: "./assets/sonia.svg" },
-    { id: 10, nombre: "Pedro Infante", servicio: "Carpintería", calificacion: 4.4, resenas: 38, precio: 480, img: "./assets/pedro.svg" },
-    { id: 11, nombre: "Ricardo Silva", servicio: "Pintura", calificacion: 4.7, resenas: 54, precio: 390, img: "./assets/ricardo.svg" },
-    { id: 12, nombre: "Elena Rostova", servicio: "Jardinería", calificacion: 4.9, resenas: 93, precio: 370, img: "./assets/elena.svg" },
-    { id: 13, nombre: "Hugo Sánchez", servicio: "Plomería", calificacion: 4.6, resenas: 29, precio: 360, img: "./assets/hugo.svg" },
-    { id: 14, nombre: "Manuel Belgrano", servicio: "Electricidad", calificacion: 4.3, resenas: 19, precio: 310, img: "./assets/manuel.svg" },
-    { id: 15, nombre: "Gabriela Mistral", servicio: "Limpieza", calificacion: 4.8, resenas: 74, precio: 330, img: "./assets/gabriela.svg" },
-    { id: 16, nombre: "Jorge Luis", servicio: "Carpintería", calificacion: 4.7, resenas: 88, precio: 520, img: "./assets/jorge.svg" },
-    { id: 17, nombre: "Andrés Calamaro", servicio: "Pintura", calificacion: 4.5, resenas: 31, precio: 410, img: "./assets/andres.svg" },
-    { id: 18, nombre: "Beatriz Pinzón", servicio: "Jardinería", calificacion: 4.8, resenas: 47, precio: 340, img: "./assets/beatriz.svg" },
-    { id: 19, nombre: "Tomás Alva", servicio: "Electricidad", calificacion: 4.9, resenas: 150, precio: 460, img: "./assets/tomas.svg" },
-    { id: 20, nombre: "Clara Luna", servicio: "Limpieza", calificacion: 4.6, resenas: 52, precio: 290, img: "./assets/clara.svg" }
-];
+let profesionalesData = [];
 
 
 let profesionalesVisibles = 6;
-let listaFiltradaActual = [...profesionalesData];
+let listaFiltradaActual = [];
 
 
 export function renderProfesionales() {
@@ -111,11 +90,66 @@ export function renderProfesionales() {
     `;
 }
 
-function inicializarLogicaProfesionales() {
-    listaFiltradaActual = [...profesionalesData];
-    profesionalesVisibles = 6;
+function cargarProfesionalesDesdeBD() {
+    fetch('/api/usuarios-trabajadores/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar profesionales');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.length > 0) {
+                profesionalesData = data.map(trabajador => {
+                    const calif = trabajador.calificacionPromedio !== null && trabajador.calificacionPromedio !== undefined
+                        ? parseFloat(trabajador.calificacionPromedio)
+                        : 4.5;
 
-    renderizarSegmento();
+                    const numResenas = Array.isArray(trabajador.resenas) ? trabajador.resenas.length : Math.floor(Math.random() * 50) + 5;
+                    const tarifa = trabajador.tarifaHora !== null && trabajador.tarifaHora !== undefined
+                        ? parseFloat(trabajador.tarifaHora)
+                        : 350.0;
+
+                    let imgPath = trabajador.fotografiaPath || "";
+                    if (!imgPath) {
+                        const nameKey = (trabajador.nombre || "").split(' ')[0].toLowerCase();
+                        const knownAvatars = ["juan", "carlos", "maria", "luis", "fernando", "beatriz", "alicia", "andres", "clara", "elena", "gabriela", "hugo", "jorge", "manuel", "miguelina", "pedro", "ricardo", "roberto", "sonia", "tomas"];
+                        if (knownAvatars.includes(nameKey)) {
+                            imgPath = `./assets/${nameKey}.svg`;
+                        } else {
+                            imgPath = `./assets/juan.svg`;
+                        }
+                    } else if (!imgPath.startsWith('.') && !imgPath.startsWith('http') && !imgPath.startsWith('assets')) {
+                        imgPath = `./assets/${imgPath}`;
+                    }
+
+                    const servicioStr = trabajador.subespecialidades || "Servicios Generales";
+                    const direccionStr = trabajador.direccion || "CDMX";
+
+                    return {
+                        id: trabajador.id,
+                        nombre: trabajador.nombre,
+                        servicio: servicioStr,
+                        calificacion: calif,
+                        resenas: numResenas,
+                        precio: tarifa,
+                        img: imgPath,
+                        direccion: direccionStr
+                    };
+                });
+                listaFiltradaActual = [...profesionalesData];
+            }
+            renderizarSegmento();
+        })
+        .catch(error => {
+            console.error('Error al obtener profesionales de la BD, usando fallback local:', error);
+            renderizarSegmento();
+        });
+}
+
+function inicializarLogicaProfesionales() {
+    profesionalesVisibles = 6;
+    cargarProfesionalesDesdeBD();
 
     const catMas = document.getElementById("cat-mas");
     const catServices = document.querySelectorAll(".cat-service");
@@ -167,12 +201,55 @@ function inicializarLogicaProfesionales() {
         btnAplicar.addEventListener("click", ejecutarFlujoFiltrado);
     }
 
+    // Buscar con el botón de la barra superior (banner)
+    const btnBuscarTop = document.querySelector(".banner-productos #btnBuscar");
+    if (btnBuscarTop) {
+        btnBuscarTop.addEventListener("click", (e) => {
+            e.preventDefault();
+            ejecutarFlujoFiltrado();
+        });
+    }
+
+    // Permitir presionar "Enter" en los buscadores de la barra superior
+    const inputServicio = document.getElementById("servicio");
+    if (inputServicio) {
+        inputServicio.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") ejecutarFlujoFiltrado();
+        });
+    }
+    const inputUbicacion = document.getElementById("ubicacion");
+    if (inputUbicacion) {
+        inputUbicacion.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") ejecutarFlujoFiltrado();
+        });
+    }
+
+    // Escuchar cambios en el input de ubicación lateral
+    const inputFiltroUbicacion = document.getElementById("filtro-ubicacion");
+    if (inputFiltroUbicacion) {
+        inputFiltroUbicacion.addEventListener("input", ejecutarFlujoFiltrado);
+    }
+
+    // Escuchar cambios en el input de distancia lateral
+    const inputFiltroDistancia = document.getElementById("filtro-distancia");
+    if (inputFiltroDistancia) {
+        inputFiltroDistancia.addEventListener("input", ejecutarFlujoFiltrado);
+    }
+
     const btnLimpiar = document.getElementById("btn-limpiar-filtros");
     if (btnLimpiar) {
         btnLimpiar.addEventListener("click", () => {
             document.getElementById("precio-min").value = "";
             document.getElementById("precio-max").value = "";
             document.getElementById("select-calificacion").value = "0";
+            const fUbi = document.getElementById("filtro-ubicacion");
+            if (fUbi) fUbi.value = "";
+            const fDist = document.getElementById("filtro-distancia");
+            if (fDist) fDist.value = "";
+            const bUbi = document.getElementById("ubicacion");
+            if (bUbi) bUbi.value = "";
+            const bServ = document.getElementById("servicio");
+            if (bServ) bServ.value = "";
             document.querySelectorAll(".chk-servicio").forEach(cb => cb.checked = false);
 
             listaFiltradaActual = [...profesionalesData];
@@ -180,6 +257,45 @@ function inicializarLogicaProfesionales() {
             renderizarSegmento();
         });
     }
+}
+
+const COORD_MAP = {
+    "cdmx": { lat: 19.4326, lon: -99.1332 },
+    "centro": { lat: 19.4326, lon: -99.1332 },
+    "reforma": { lat: 19.4270, lon: -99.1677 },
+    "guadalajara": { lat: 20.6597, lon: -103.3496 },
+    "monterrey": { lat: 25.6866, lon: -100.3161 },
+    "puebla": { lat: 19.0413, lon: -98.2062 },
+    "queretaro": { lat: 20.5888, lon: -100.3899 },
+    "merida": { lat: 20.9674, lon: -89.5926 }
+};
+
+function obtenerCoordenadas(direccion) {
+    const dir = (direccion || "").toLowerCase();
+    for (const key in COORD_MAP) {
+        if (dir.includes(key)) {
+            return COORD_MAP[key];
+        }
+    }
+    let hash = 0;
+    for (let i = 0; i < dir.length; i++) {
+        hash = dir.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const latOffset = (Math.abs(hash % 100)) / 1000;
+    const lonOffset = (Math.abs((hash >> 8) % 100)) / 1000;
+    return { lat: 19.4326 + latOffset, lon: -99.1332 + lonOffset };
+}
+
+function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
 }
 
 function ejecutarFlujoFiltrado() {
@@ -190,11 +306,30 @@ function ejecutarFlujoFiltrado() {
     const precioMax = parseFloat(document.getElementById("precio-max").value) || Infinity;
     const calificacionMin = parseFloat(document.getElementById("select-calificacion").value) || 0;
 
+    // Buscar en inputs del banner y filtro lateral
+    const queryServicio = (document.getElementById("servicio")?.value || "").trim().toLowerCase();
+    const queryUbicacion = (document.getElementById("ubicacion")?.value || document.getElementById("filtro-ubicacion")?.value || "").trim().toLowerCase();
+
+    // Filtro por distancia en km
+    const inputDistancia = document.getElementById("filtro-distancia");
+    const maxDistancia = parseFloat(inputDistancia?.value) || Infinity;
+
     listaFiltradaActual = profesionalesData.filter(pro => {
-        const cumpleServicio = serviciosSeleccionados.length === 0 || serviciosSeleccionados.includes(pro.servicio);
+        const cumpleServicioCheckbox = serviciosSeleccionados.length === 0 || serviciosSeleccionados.includes(pro.servicio);
+        const cumpleServicioQuery = !queryServicio || pro.servicio.toLowerCase().includes(queryServicio) || pro.nombre.toLowerCase().includes(queryServicio);
         const cumplePrecio = pro.precio >= precioMin && pro.precio <= precioMax;
         const cumpleStars = pro.calificacion >= calificacionMin;
-        return cumpleServicio && cumplePrecio && cumpleStars;
+        const cumpleUbicacion = !queryUbicacion || pro.direccion.toLowerCase().includes(queryUbicacion);
+        
+        let cumpleDistancia = true;
+        if (maxDistancia !== Infinity && queryUbicacion) {
+            const coordCliente = obtenerCoordenadas(queryUbicacion);
+            const coordPro = obtenerCoordenadas(pro.direccion);
+            const dist = calcularDistanciaKm(coordCliente.lat, coordCliente.lon, coordPro.lat, coordPro.lon);
+            cumpleDistancia = dist <= maxDistancia;
+        }
+
+        return cumpleServicioCheckbox && cumpleServicioQuery && cumplePrecio && cumpleStars && cumpleUbicacion && cumpleDistancia;
     });
 
     profesionalesVisibles = 6;
@@ -220,7 +355,7 @@ function renderizarSegmento() {
         const col = document.createElement("div");
         col.className = "col";
         col.innerHTML = `
-            <div class="card h-100 border text-start shadow-sm" style="border-radius: 8px; overflow: hidden;">
+            <div class="card h-100 border text-start shadow-sm card-profesional" style="border-radius: 8px; overflow: hidden; cursor: pointer;">
                 <div style="height: 180px; background-color: #eaeaea;" class="d-flex align-items-center justify-content-center">
                     <img class="w-100 h-100" style="object-fit: cover; object-position: center;" src="${pro.img}" alt="foto_perfil">
                 </div>
@@ -247,6 +382,20 @@ function renderizarSegmento() {
                 </div>
             </div>
         `;
+
+        const card = col.querySelector('.card-profesional');
+        if (card) {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                if (!currentUser || !currentUser.email) {
+                    window.location.hash = '#login';
+                } else {
+                    window.location.hash = `#perfil-profesional/${pro.id}`;
+                }
+            });
+        }
+
         grid.appendChild(col);
     });
 

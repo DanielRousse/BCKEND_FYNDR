@@ -34,6 +34,10 @@ public class UsuarioTrabajadorService {
         return repository.findAll();
     } // getEntidades
 
+    public org.springframework.data.domain.Page<UsuarioTrabajador> getEntidadesPaginadas(int page, int size) {
+        return repository.findAll(org.springframework.data.domain.PageRequest.of(page, size));
+    } // getEntidadesPaginadas
+
     public UsuarioTrabajador getEntidad(Long id) {
         return repository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("El usuario-trabajador con el id [" + id + "] no existe"));
@@ -127,6 +131,9 @@ public class UsuarioTrabajadorService {
                 } // if
                 if (dto.getCalificacionPromedio() != null) {
                     t.setCalificacionPromedio(dto.getCalificacionPromedio());
+                } // if
+                if (dto.getDireccion() != null) {
+                    t.setDireccion(dto.getDireccion());
                 } // if
 
                 trabajador = repository.save(t);

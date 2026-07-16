@@ -42,10 +42,10 @@ public class ProfesionController {
     @PutMapping(path="{entidadId}")
     public Profesion actualizarProfesion(
             @PathVariable("entidadId") Long id,
-            @RequestParam(required = false) String nombreProfesion
+            @RequestBody Profesion profesion
     ) {
         // PUT http://localhost:8080/api/profesiones/1
-        return service.actualizarEntidad(id, nombreProfesion);
+        return service.actualizarEntidad(id, profesion.getNombreProfesion());
     } // actualizarProfesion
 
     @DeleteMapping(path="{entidadId}")

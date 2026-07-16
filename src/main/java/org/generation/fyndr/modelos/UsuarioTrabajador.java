@@ -3,7 +3,10 @@ package org.generation.fyndr.modelos;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,36 +25,44 @@ public class UsuarioTrabajador {
     @Column(name = "id_usuario_trabajador", unique=true, nullable = false)
     private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El formato del email es inválido")
     @Column(name = "email" , nullable = false, unique = true)
     private String email;
 
+    @NotBlank(message = "El teléfono es obligatorio")
+    @Pattern(regexp = "^[0-9]{10,15}$", message = "El teléfono debe contener entre 10 y 15 dígitos numéricos")
     @Column(name = "telefono", nullable = false)
     private String telefono;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "contrasena", nullable = false)
     private String contrasena;
 
     @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
-    @Column(name = "ine_path")
+    @Column(name = "ine_path", columnDefinition = "LONGTEXT")
     private String inePath;
 
     @Column(name = "curp" , unique = true)
     private String curp;
 
-    @Column(name = "fotografia_path")
+    @Column(name = "fotografia_path", columnDefinition = "LONGTEXT")
     private String fotografiaPath;
 
-    @Column(name = "comprobante_path")
+    @Column(name = "comprobante_path", columnDefinition = "LONGTEXT")
     private String comprobantePath;
 
-    @Column(name = "antecedentes_path")
+    @Column(name = "antecedentes_path", columnDefinition = "LONGTEXT")
     private String antecedentesPath;
 
+    @Min(value = 0, message = "Los años de experiencia no pueden ser negativos")
     @ColumnDefault("0")
     @Column(name = "experiencia_anos")
     private Integer experienciaAnos;
@@ -62,10 +73,13 @@ public class UsuarioTrabajador {
     @Column(name = "subespecialidades")
     private String subespecialidades;
 
-    @Column(name = "certificaciones_path")
+    @Column(name = "direccion")
+    private String direccion;
+
+    @Column(name = "certificaciones_path", columnDefinition = "LONGTEXT")
     private String certificacionesPath;
 
-    @Column(name = "portafolio_path")
+    @Column(name = "portafolio_path", columnDefinition = "LONGTEXT")
     private String portafolioPath;
 
     @Column(name = "rfc", unique = true)
@@ -90,10 +104,28 @@ public class UsuarioTrabajador {
     private LocalDateTime fechaRegistro;
 
     @OneToMany(mappedBy = "usuarioTrabajador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value = "usuarioTrabajador-resena")
     private List<Resena> resenas;
 
+    @ManyToMany
+    @JoinTable(
+        name = "trabajador_profesion",
+        joinColumns = @JoinColumn(name = "id_usuario_trabajador"),
+        inverseJoinColumns = @JoinColumn(name = "id_profesion")
+    )
+    private List<Profesion> profesiones;
 
+    @OneToMany(mappedBy = "usuarioTrabajador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Publicacion> publicaciones;
+
+    @OneToMany(mappedBy = "usuarioTrabajador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Contratacion> contrataciones;
+
+    @OneToMany(mappedBy = "usuarioTrabajador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Mensaje> mensajes;
 
     public UsuarioTrabajador() {
     } // UsuarioTrabajador
@@ -231,6 +263,14 @@ public class UsuarioTrabajador {
         this.subespecialidades = subespecialidades;
     }
 
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
     public String getCertificacionesPath() {
         return certificacionesPath;
     }
@@ -311,6 +351,38 @@ public class UsuarioTrabajador {
         this.resenas = resenas;
     }
 
+    public List<Profesion> getProfesiones() {
+        return profesiones;
+    }
+
+    public void setProfesiones(List<Profesion> profesiones) {
+        this.profesiones = profesiones;
+    }
+
+    public List<Publicacion> getPublicaciones() {
+        return publicaciones;
+    }
+
+    public void setPublicaciones(List<Publicacion> publicaciones) {
+        this.publicaciones = publicaciones;
+    }
+
+    public List<Contratacion> getContrataciones() {
+        return contrataciones;
+    }
+
+    public void setContrataciones(List<Contratacion> contrataciones) {
+        this.contrataciones = contrataciones;
+    }
+
+    public List<Mensaje> getMensajes() {
+        return mensajes;
+    }
+
+    public void setMensajes(List<Mensaje> mensajes) {
+        this.mensajes = mensajes;
+    }
+
     @Override
     public String toString() {
         return "UsuarioTrabajador{" +
@@ -318,22 +390,9 @@ public class UsuarioTrabajador {
                 ", nombre='" + nombre + '\'' +
                 ", email='" + email + '\'' +
                 ", telefono='" + telefono + '\'' +
-                ", contrasena='" + contrasena + '\'' +
                 ", fechaNacimiento=" + fechaNacimiento +
-                ", inePath='" + inePath + '\'' +
-                ", curp='" + curp + '\'' +
-                ", fotografiaPath='" + fotografiaPath + '\'' +
-                ", comprobantePath='" + comprobantePath + '\'' +
-                ", antecedentesPath='" + antecedentesPath + '\'' +
                 ", experienciaAnos=" + experienciaAnos +
-                ", descripcion='" + descripcion + '\'' +
                 ", subespecialidades='" + subespecialidades + '\'' +
-                ", certificacionesPath='" + certificacionesPath + '\'' +
-                ", portafolioPath='" + portafolioPath + '\'' +
-                ", rfc='" + rfc + '\'' +
-                ", constanciaFiscalPath='" + constanciaFiscalPath + '\'' +
-                ", clabe='" + clabe + '\'' +
-                ", banco='" + banco + '\'' +
                 ", tarifaHora=" + tarifaHora +
                 ", calificacionPromedio=" + calificacionPromedio +
                 ", fechaRegistro=" + fechaRegistro +

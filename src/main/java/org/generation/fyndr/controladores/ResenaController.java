@@ -36,7 +36,7 @@ public class ResenaController {
     }
 
     @GetMapping("/{entidadId}")
-    public ResponseEntity<Resena> getResena(@PathVariable Integer entidadId) {
+    public ResponseEntity<Resena> getResena(@PathVariable Long entidadId) {
         ResenaController.logger.info("Buscando la reseña con id: {}", entidadId);
         Resena resena = resenaService.obtenerResena(entidadId);
         ResenaController.logger.info("Reseña encontrada: {}", resena);
@@ -52,7 +52,7 @@ public class ResenaController {
     }
 
     @PutMapping("/{entidadId}")
-    public ResponseEntity<Resena> actualizarResena(@PathVariable Integer entidadId, @RequestBody Resena resena) {
+    public ResponseEntity<Resena> actualizarResena(@PathVariable Long entidadId, @RequestBody Resena resena) {
         ResenaController.logger.info("Actualizado reseña con id: {}", entidadId);
         Resena resenaBD = this.resenaService.actualizarResena(entidadId, resena);
         ResenaController.logger.info("Reseña actualizada: {}", resenaBD);
@@ -60,7 +60,7 @@ public class ResenaController {
     }
 
     @DeleteMapping("/{entidadId}")
-    public ResponseEntity<Void> eliminarResena(@PathVariable Integer entidadId) {
+    public ResponseEntity<Void> eliminarResena(@PathVariable Long entidadId) {
         ResenaController.logger.info("Eliminando reseña con id: {}", entidadId);
         this.resenaService.borrarResena(entidadId);
         return ResponseEntity.noContent().build();

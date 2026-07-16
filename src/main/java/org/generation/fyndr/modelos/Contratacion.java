@@ -11,11 +11,13 @@ public class Contratacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_usuario_comun", nullable = false)
-    private Long idUsuarioComun;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_comun", nullable = false)
+    private UsuarioComun usuarioComun;
 
-    @Column(name = "id_usuario_trabajador", nullable = false)
-    private Long idUsuarioTrabajador;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_trabajador", nullable = false)
+    private UsuarioTrabajador usuarioTrabajador;
 
     @Column(name = "fecha_contratacion", nullable = false)
     private LocalDateTime fechaContratacion;
@@ -26,23 +28,22 @@ public class Contratacion {
     // Constructor vacío
     public Contratacion() {}
 
-    // Constructor completo adaptado (sin el contador manual obsoleto)
-    public Contratacion(Long idUsuarioComun, Long idUsuarioTrabajador, LocalDateTime fechaContratacion, String estado) {
-        this.idUsuarioComun = idUsuarioComun;
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
+    // Constructor completo
+    public Contratacion(UsuarioComun usuarioComun, UsuarioTrabajador usuarioTrabajador, LocalDateTime fechaContratacion, String estado) {
+        this.usuarioComun = usuarioComun;
+        this.usuarioTrabajador = usuarioTrabajador;
         this.fechaContratacion = fechaContratacion;
         this.estado = estado;
     }
 
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Long getIdUsuarioComun() { return idUsuarioComun; }
-    public void setIdUsuarioComun(Long idUsuarioComun) { this.idUsuarioComun = idUsuarioComun; }
+    public UsuarioComun getUsuarioComun() { return usuarioComun; }
+    public void setUsuarioComun(UsuarioComun usuarioComun) { this.usuarioComun = usuarioComun; }
 
-    public Long getIdUsuarioTrabajador() { return idUsuarioTrabajador; }
-    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) { this.idUsuarioTrabajador = idUsuarioTrabajador; }
+    public UsuarioTrabajador getUsuarioTrabajador() { return usuarioTrabajador; }
+    public void setUsuarioTrabajador(UsuarioTrabajador usuarioTrabajador) { this.usuarioTrabajador = usuarioTrabajador; }
 
     public LocalDateTime getFechaContratacion() { return fechaContratacion; }
     public void setFechaContratacion(LocalDateTime fechaContratacion) { this.fechaContratacion = fechaContratacion; }
@@ -54,8 +55,8 @@ public class Contratacion {
     public String toString() {
         return "Contratacion{" +
                 "id=" + id +
-                ", idUsuarioComun=" + idUsuarioComun +
-                ", idUsuarioTrabajador=" + idUsuarioTrabajador +
+                ", usuarioComun=" + (usuarioComun != null ? usuarioComun.getId() : null) +
+                ", usuarioTrabajador=" + (usuarioTrabajador != null ? usuarioTrabajador.getId() : null) +
                 ", fechaContratacion=" + fechaContratacion +
                 ", estado='" + estado + '\'' +
                 '}';

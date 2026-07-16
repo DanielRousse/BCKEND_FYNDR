@@ -14,26 +14,25 @@ public class Resena {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_resena")
-    private Integer id;
+    private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario_comun")
-    @JsonBackReference
+    @JsonBackReference(value = "usuarioComun-resena")
     private UsuarioComun usuarioComun;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario_trabajador")
-    @JsonBackReference
+    @JsonBackReference(value = "usuarioTrabajador-resena")
     private UsuarioTrabajador usuarioTrabajador;
     private Integer calificacion;
     private String comentario;
     @Column(name = "fecha_resena")
     private LocalDateTime fechaResena;
-    private Long total = 0L;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -77,14 +76,6 @@ public class Resena {
         this.fechaResena = fechaResena;
     }
 
-    public Long getTotal() {
-        return total;
-    }
-
-    public void setTotal(Long total) {
-        this.total = total;
-    }
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Resena{");
@@ -93,7 +84,6 @@ public class Resena {
         sb.append(", calificacion=").append(calificacion);
         sb.append(", comentario='").append(comentario).append('\'');
         sb.append(", fechaResena=").append(fechaResena);
-        sb.append(", total=").append(total);
         sb.append('}');
         return sb.toString();
     }

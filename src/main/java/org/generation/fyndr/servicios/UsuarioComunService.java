@@ -27,7 +27,7 @@ public class UsuarioComunService {
         return new ArrayList<>(repository.findAll());
     } // getEntidades
 
-    public UsuarioComun getEntidad(Integer id) {
+    public UsuarioComun getEntidad(Long id) {
         return repository.findById(id).orElse(null);
     } // getEntidad
 
@@ -36,7 +36,7 @@ public class UsuarioComunService {
         return repository.save(obj);
     } // crearEntidad
 
-    public UsuarioComun deleteEntidad(Integer id) {
+    public UsuarioComun deleteEntidad(Long id) {
         UsuarioComun ref = getEntidad(id);
         if (ref != null) {
             repository.delete(ref);
@@ -45,7 +45,7 @@ public class UsuarioComunService {
         return null;
     } // deleteEntidad
 
-    public UsuarioComun actualizarEntidad(Integer id, String nombre, String email, String telefono, String contrasena) {
+    public UsuarioComun actualizarEntidad(Long id, String nombre, String email, String telefono, String contrasena, String fotografiaPath) {
         UsuarioComun u = getEntidad(id);
         if (u != null) {
             if (nombre != null) {
@@ -59,6 +59,9 @@ public class UsuarioComunService {
             } // if
             if (contrasena != null) {
                 u.setContrasena(passwordEncoder.encode(contrasena));
+            } // if
+            if (fotografiaPath != null) {
+                u.setFotografiaPath(fotografiaPath);
             } // if
             return repository.save(u);
         } // if

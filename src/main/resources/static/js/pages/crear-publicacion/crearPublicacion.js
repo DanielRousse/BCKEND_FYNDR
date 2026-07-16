@@ -147,6 +147,29 @@ export function initCrearPublicacionPage() {
         });
     }
 
+    // Actualización de Vista Previa en tiempo real
+    if (titleInput) {
+        titleInput.addEventListener('input', (e) => {
+            const previewTitle = form.querySelector('#vista-previa-titulo');
+            if (previewTitle) previewTitle.textContent = e.target.value || 'Instalación eléctrica residencial';
+        });
+    }
+
+    if (priceInput) {
+        priceInput.addEventListener('input', (e) => {
+            const previewPrice = form.querySelector('#vista-previa-precio');
+            if (previewPrice) previewPrice.textContent = e.target.value ? `Desde $${e.target.value} MXN` : 'Desde $500 MXN';
+        });
+    }
+
+    const descInput = form.querySelector('#descripcion-servicio');
+    if (descInput) {
+        descInput.addEventListener('input', (e) => {
+            const previewDesc = form.querySelector('#vista-previa-descripcion');
+            if (previewDesc) previewDesc.textContent = e.target.value || 'Instalaciones eléctricas seguras y eficientes...';
+        });
+    }
+
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
@@ -171,15 +194,67 @@ export function initCrearPublicacionPage() {
 
         try {
             const payload = await buildPublicacionPayload(form);
-            const payloadJson = JSON.stringify(payload, null, 2);
+            const info = payload.informacionServicio;
 
-            window.latestPublicacionPayload = payload;
-            window.latestPublicacionPayloadJson = payloadJson;
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.alert("Debes iniciar sesión para publicar un servicio.");
+                window.location.hash = '#login';
+                return;
+            }
 
-            console.log(payloadJson);
+            // Obtener el trabajador logueado
+            let idTrabajador = 1;
+            try {
+                const resMe = await fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (resMe.ok) {
+                    const me = await resMe.json();
+                    if (me.role === 'trabajador') {
+                        idTrabajador = me.id;
+                    }
+                }
+            } catch (err) {
+                console.error("Error al buscar ID de trabajador:", err);
+            }
+
+            // Construir payload que espera el backend
+            const publicacionBackend = {
+                titulo: info.tituloServicio || "Servicio",
+                descripcion: info.descripcionServicio || "",
+                precio: parseFloat(info.precioEstimado) || 0.0,
+                idUsuarioTrabajador: idTrabajador
+            };
+
+            // Enviar al backend mediante fetch
+            fetch('/api/publicaciones', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(publicacionBackend)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                window.alert("¡Publicación creada con éxito!");
+                form.reset();
+                window.location.hash = '#lista-productos';
+            })
+            .catch(error => {
+                window.alert(`No se pudo enviar la publicación al servidor: ${error.message}`);
+            });
+
         } catch (error) {
             window.alert(`No se pudo preparar el JSON del formulario: ${error.message}`);
-
         }
     });
 }

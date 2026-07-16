@@ -10,6 +10,6 @@ import java.util.Optional;
  * Interfaz de repositorio para la entidad UsuarioComun con soporte de Spring Data JPA.
  */
 @Repository
-public interface UsuarioComunRepository extends JpaRepository<UsuarioComun, Integer> {
+public interface UsuarioComunRepository extends JpaRepository<UsuarioComun, Long> {
     Optional<UsuarioComun> findByEmail(String email);
 } // interface UsuarioComunRepository

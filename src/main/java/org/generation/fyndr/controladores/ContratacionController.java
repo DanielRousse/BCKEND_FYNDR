@@ -1,14 +1,17 @@
 package org.generation.fyndr.controladores;
 
-import org.generation.fyndr.modelos.Contratacion;
+import org.generation.fyndr.dto.ContratacionDTO;
+import org.generation.fyndr.dto.ContratacionResponseDTO;
 import org.generation.fyndr.servicios.ContratacionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/api/contrataciones/")
+@RequestMapping(path="/api/contrataciones")
 public class ContratacionController {
 
     private final ContratacionService service;
@@ -18,37 +21,53 @@ public class ContratacionController {
         this.service = service;
     }
 
-    //get http://localhost:8080/api/contrataciones/
     @GetMapping
-    public List<Contratacion> getContrataciones() {
-        return service.getEntidades();
+    public ResponseEntity<List<ContratacionResponseDTO>> getContrataciones() {
+        return ResponseEntity.ok(service.getEntidades());
     }
 
-    //get http://localhost:8080/api/contrataciones/1
-    @GetMapping(path="/{entidadId}")
-    public Contratacion getContratacion(@PathVariable("entidadId") Long id) {
-        return service.getEntidad(id);
+    @GetMapping("/{entidadId}")
+    public ResponseEntity<ContratacionResponseDTO> getContratacion(@PathVariable("entidadId") Long id) {
+        ContratacionResponseDTO dto = service.getEntidad(id);
+        if (dto != null) {
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    //post http://localhost:8080/api/contrataciones/
     @PostMapping
-    public Contratacion crearContratacion(@RequestBody Contratacion contratacion) {
-        return service.crearEntidad(contratacion);
+    public ResponseEntity<ContratacionResponseDTO> crearContratacion(@RequestBody ContratacionDTO dto) {
+        ContratacionResponseDTO created = service.crearEntidad(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    //put http://localhost:8080/api/contrataciones/1
-    @PutMapping(path="/{entidadId}")
-    public Contratacion actualizarContratacion(
+    @PutMapping("/{entidadId}")
+    public ResponseEntity<ContratacionResponseDTO> actualizarContratacion(
             @PathVariable("entidadId") Long id,
-            @RequestParam(required = false) Long idUsuarioComun,
-            @RequestParam(required = false) Long idUsuarioTrabajador,
-            @RequestParam(required = false) String estado) {
-        return service.actualizarEntidad(id, idUsuarioComun, idUsuarioTrabajador, estado);
+            @RequestBody ContratacionDTO dto) {
+        ContratacionResponseDTO updated = service.actualizarEntidad(id, dto);
+        if (updated != null) {
+            return ResponseEntity.ok(updated);
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    //delete http://localhost:8080/api/contrataciones/1
-    @DeleteMapping(path="/{entidadId}")
-    public Contratacion eliminarContratacion(@PathVariable("entidadId") Long id) {
-        return service.deleteEntidad(id);
+    @DeleteMapping("/{entidadId}")
+    public ResponseEntity<ContratacionResponseDTO> eliminarContratacion(@PathVariable("entidadId") Long id) {
+        ContratacionResponseDTO deleted = service.deleteEntidad(id);
+        if (deleted != null) {
+            return ResponseEntity.ok(deleted);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<ContratacionResponseDTO>> getContratacionesPorUsuario(@PathVariable("usuarioId") Long id) {
+        return ResponseEntity.ok(service.getContratacionesPorUsuario(id));
+    }
+
+    @GetMapping("/trabajador/{trabajadorId}")
+    public ResponseEntity<List<ContratacionResponseDTO>> getContratacionesPorTrabajador(@PathVariable("trabajadorId") Long id) {
+        return ResponseEntity.ok(service.getContratacionesPorTrabajador(id));
     }
 }

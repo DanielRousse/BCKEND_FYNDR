@@ -1,63 +1,113 @@
 package org.generation.fyndr.servicios;
 
+import org.generation.fyndr.dto.MensajeDTO;
+import org.generation.fyndr.dto.MensajeResponseDTO;
 import org.generation.fyndr.modelos.Mensaje;
+import org.generation.fyndr.modelos.UsuarioComun;
+import org.generation.fyndr.modelos.UsuarioTrabajador;
 import org.generation.fyndr.repositorios.MensajeRepository;
+import org.generation.fyndr.repositorios.UsuarioComunRepository;
+import org.generation.fyndr.repositorios.UsuarioTrabajadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class MensajeService {
 
+    private final MensajeRepository mensajeRepository;
+    private final UsuarioComunRepository usuarioComunRepository;
+    private final UsuarioTrabajadorRepository usuarioTrabajadorRepository;
+
     @Autowired
-    private MensajeRepository mensajeRepository;
-
-    // se crear  un mensaje en la base de datos
-    public Mensaje crearMensaje(Mensaje mensaje) {
-        return mensajeRepository.save(mensaje);
+    public MensajeService(MensajeRepository mensajeRepository,
+                          UsuarioComunRepository usuarioComunRepository,
+                          UsuarioTrabajadorRepository usuarioTrabajadorRepository) {
+        this.mensajeRepository = mensajeRepository;
+        this.usuarioComunRepository = usuarioComunRepository;
+        this.usuarioTrabajadorRepository = usuarioTrabajadorRepository;
     }
 
-    // obtenemos todos los mensajes reales de sql
-    public List<Mensaje> todosLosMensajes() {
-        return mensajeRepository.findAll();
+    public MensajeResponseDTO crearMensaje(MensajeDTO dto) {
+        UsuarioComun uc = usuarioComunRepository.findById(dto.getIdUsuarioComun())
+                .orElseThrow(() -> new RuntimeException("Usuario común no encontrado"));
+        UsuarioTrabajador ut = usuarioTrabajadorRepository.findById(dto.getIdUsuarioTrabajador())
+                .orElseThrow(() -> new RuntimeException("Usuario trabajador no encontrado"));
+
+        Mensaje mensaje = new Mensaje(uc, ut, dto.getRemitente(), dto.getContenido(), dto.getFechaEnvio());
+        Mensaje saved = mensajeRepository.save(mensaje);
+        return convertToResponseDTO(saved);
     }
 
-    // buscamos  un mensaje específico por su el id
-    public Optional<Mensaje> mensajesPorId(Long id) {
-        return mensajeRepository.findById(id);
-    }
-
-    // filtramos mensajes de un usuario comun
-    public List<Mensaje> mensajesPorUsuarioComun(Long idUsuarioComun) {
+    public List<MensajeResponseDTO> todosLosMensajes() {
         return mensajeRepository.findAll().stream()
-                .filter(m -> m.getIdUsuarioComun().equals(idUsuarioComun))
+                .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
 
-    // filtramos para Usuario Trabajador
-    public List<Mensaje> mensajesPorUsuarioTrabajador(Long idUsuarioTrabajador) {
+    public MensajeResponseDTO mensajesPorId(Long id) {
+        Mensaje m = mensajeRepository.findById(id).orElse(null);
+        return m != null ? convertToResponseDTO(m) : null;
+    }
+
+    public List<MensajeResponseDTO> mensajesPorUsuarioComun(Long idUsuarioComun) {
         return mensajeRepository.findAll().stream()
-                .filter(m -> m.getIdUsuarioTrabajador().equals(idUsuarioTrabajador))
+                .filter(m -> m.getUsuarioComun().getId().equals(idUsuarioComun))
+                .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
 
-    // elimina mensaje
+    public List<MensajeResponseDTO> mensajesPorUsuarioTrabajador(Long idUsuarioTrabajador) {
+        return mensajeRepository.findAll().stream()
+                .filter(m -> m.getUsuarioTrabajador().getId().equals(idUsuarioTrabajador))
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MensajeResponseDTO> obtenerConversacion(Long idUsuarioComun, Long idUsuarioTrabajador) {
+        return mensajeRepository.findConversation(idUsuarioComun, idUsuarioTrabajador).stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     public void eliminarMensaje(Long id) {
         mensajeRepository.deleteById(id);
     }
 
-    // actualiza mensaje
-    public Mensaje actualizarMensaje(Long id, Mensaje datosActualizados) {
-        return mensajeRepository.findById(id).map(mensaje -> {
-            mensaje.setIdUsuarioComun(datosActualizados.getIdUsuarioComun());
-            mensaje.setIdUsuarioTrabajador(datosActualizados.getIdUsuarioTrabajador());
-            mensaje.setRemitente(datosActualizados.getRemitente());
-            mensaje.setContenido(datosActualizados.getContenido());
-            mensaje.setFechaEnvio(datosActualizados.getFechaEnvio());
-            return mensajeRepository.save(mensaje);
-        }).orElseThrow(() -> new RuntimeException("Mensaje no encontrado con id: " + id));
+    public MensajeResponseDTO actualizarMensaje(Long id, MensajeDTO dto) {
+        Mensaje mensaje = mensajeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mensaje no encontrado con id: " + id));
+
+        if (dto.getIdUsuarioComun() != null) {
+            UsuarioComun uc = usuarioComunRepository.findById(dto.getIdUsuarioComun())
+                    .orElseThrow(() -> new RuntimeException("Usuario común no encontrado"));
+            mensaje.setUsuarioComun(uc);
+        }
+        if (dto.getIdUsuarioTrabajador() != null) {
+            UsuarioTrabajador ut = usuarioTrabajadorRepository.findById(dto.getIdUsuarioTrabajador())
+                    .orElseThrow(() -> new RuntimeException("Usuario trabajador no encontrado"));
+            mensaje.setUsuarioTrabajador(ut);
+        }
+        if (dto.getRemitente() != null) mensaje.setRemitente(dto.getRemitente());
+        if (dto.getContenido() != null) mensaje.setContenido(dto.getContenido());
+        if (dto.getFechaEnvio() != null) mensaje.setFechaEnvio(dto.getFechaEnvio());
+
+        Mensaje updated = mensajeRepository.save(mensaje);
+        return convertToResponseDTO(updated);
+    }
+
+    private MensajeResponseDTO convertToResponseDTO(Mensaje m) {
+        return new MensajeResponseDTO(
+                m.getId(),
+                m.getUsuarioComun().getId(),
+                m.getUsuarioComun().getNombre(),
+                m.getUsuarioTrabajador().getId(),
+                m.getUsuarioTrabajador().getNombre(),
+                m.getRemitente(),
+                m.getContenido(),
+                m.getFechaEnvio()
+        );
     }
 }

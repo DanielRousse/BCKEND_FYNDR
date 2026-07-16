@@ -1,15 +1,17 @@
 package org.generation.fyndr.controladores;
 
-import org.generation.fyndr.modelos.Mensaje;
+import org.generation.fyndr.dto.MensajeDTO;
+import org.generation.fyndr.dto.MensajeResponseDTO;
 import org.generation.fyndr.servicios.MensajeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/api/mensajes/")
+@RequestMapping(path="/api/mensajes")
 public class MensajeController {
 
     private final MensajeService service;
@@ -19,40 +21,38 @@ public class MensajeController {
         this.service = service;
     }
 
-    // get http://localhost:8080/api/mensajes/
     @GetMapping
-    public List<Mensaje> getMensajes() {
-        return service.todosLosMensajes();
+    public ResponseEntity<List<MensajeResponseDTO>> getMensajes() {
+        return ResponseEntity.ok(service.todosLosMensajes());
     }
 
-    // get http://localhost:8080/api/mensajes/1
-    @GetMapping(path="/{entidadId}")
-    public ResponseEntity<Mensaje> getMensaje(@PathVariable("entidadId") Long id) {
-        return service.mensajesPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/{entidadId}")
+    public ResponseEntity<MensajeResponseDTO> getMensaje(@PathVariable("entidadId") Long id) {
+        MensajeResponseDTO dto = service.mensajesPorId(id);
+        if (dto != null) {
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    //  post http://localhost:8080/api/mensajes/
     @PostMapping
-    public Mensaje crearMensaje(@RequestBody Mensaje mensaje) {
-        return service.crearMensaje(mensaje);
+    public ResponseEntity<MensajeResponseDTO> crearMensaje(@RequestBody MensajeDTO dto) {
+        MensajeResponseDTO created = service.crearMensaje(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    //  put http://localhost:8080/api/mensajes/1
-    @PutMapping(path="/{entidadId}")
-    public ResponseEntity<Mensaje> actualizarMensaje(
+    @PutMapping("/{entidadId}")
+    public ResponseEntity<MensajeResponseDTO> actualizarMensaje(
             @PathVariable("entidadId") Long id,
-            @RequestBody Mensaje datosActualizados) {
+            @RequestBody MensajeDTO dto) {
         try {
-            return ResponseEntity.ok(service.actualizarMensaje(id, datosActualizados));
+            return ResponseEntity.ok(service.actualizarMensaje(id, dto));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    // delete http://localhost:8080/api/mensajes/1
-    @DeleteMapping(path="/{entidadId}")
+    @DeleteMapping("/{entidadId}")
     public ResponseEntity<Void> eliminarMensaje(@PathVariable("entidadId") Long id) {
         try {
             service.eliminarMensaje(id);
@@ -60,5 +60,12 @@ public class MensajeController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/conversacion")
+    public ResponseEntity<List<MensajeResponseDTO>> getConversacion(
+            @RequestParam("idUsuarioComun") Long idUsuarioComun,
+            @RequestParam("idUsuarioTrabajador") Long idUsuarioTrabajador) {
+        return ResponseEntity.ok(service.obtenerConversacion(idUsuarioComun, idUsuarioTrabajador));
     }
 }

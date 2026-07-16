@@ -111,29 +111,6 @@ export function initLogin() {
     const alertContainer = document.getElementById('login-formAlertContainer');
     const togglePassword = document.getElementById('login-togglePassword');
 
-    
-    const seedMockUser = () => {
-        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        
-        
-        const mockUser = {
-            email: btoa('test@example.com'),
-            contrasena: btoa('Password123!'),
-            nombre: 'Usuario de Prueba'
-        };
-
-        
-        const exists = registeredUsers.some(user => user.email === mockUser.email);
-        if (!exists) {
-            registeredUsers.push(mockUser);
-            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-        }
-    };
-
-    
-    seedMockUser();
-
-    
     if (togglePassword) {
         togglePassword.addEventListener('click', () => {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -183,10 +160,15 @@ export function initLogin() {
             return response.json();
         })
         .then(data => {
-            // data contiene: accessToken, nombre, email
+            // data contiene: accessToken, nombre, email, role, id
             localStorage.setItem('token', data.accessToken);
             
-            const activeUser = { nombre: data.nombre, email: data.email };
+            const activeUser = { 
+                nombre: data.nombre, 
+                email: data.email,
+                role: data.role,
+                id: data.id
+            };
             localStorage.setItem('currentUser', JSON.stringify(activeUser));
 
             alertContainer.innerHTML = `

@@ -11,11 +11,13 @@ public class Mensaje {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_usuario_comun", nullable = false)
-    private Long idUsuarioComun;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_comun", nullable = false)
+    private UsuarioComun usuarioComun;
 
-    @Column(name = "id_usuario_trabajador", nullable = false)
-    private Long idUsuarioTrabajador;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_trabajador", nullable = false)
+    private UsuarioTrabajador usuarioTrabajador;
 
     @Column(name = "remitente", nullable = false)
     private String remitente;
@@ -29,24 +31,23 @@ public class Mensaje {
     // Constructor vacío obligatorio
     public Mensaje() {}
 
-    // Constructor completo adaptado
-    public Mensaje(Long idUsuarioComun, Long idUsuarioTrabajador, String remitente, String contenido, LocalDateTime fechaEnvio) {
-        this.idUsuarioComun = idUsuarioComun;
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
+    // Constructor completo
+    public Mensaje(UsuarioComun usuarioComun, UsuarioTrabajador usuarioTrabajador, String remitente, String contenido, LocalDateTime fechaEnvio) {
+        this.usuarioComun = usuarioComun;
+        this.usuarioTrabajador = usuarioTrabajador;
         this.remitente = remitente;
         this.contenido = contenido;
         this.fechaEnvio = fechaEnvio;
     }
 
-    // getters y setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Long getIdUsuarioComun() { return idUsuarioComun; }
-    public void setIdUsuarioComun(Long idUsuarioComun) { this.idUsuarioComun = idUsuarioComun; }
+    public UsuarioComun getUsuarioComun() { return usuarioComun; }
+    public void setUsuarioComun(UsuarioComun usuarioComun) { this.usuarioComun = usuarioComun; }
 
-    public Long getIdUsuarioTrabajador() { return idUsuarioTrabajador; }
-    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) { this.idUsuarioTrabajador = idUsuarioTrabajador; }
+    public UsuarioTrabajador getUsuarioTrabajador() { return usuarioTrabajador; }
+    public void setUsuarioTrabajador(UsuarioTrabajador usuarioTrabajador) { this.usuarioTrabajador = usuarioTrabajador; }
 
     public String getRemitente() { return remitente; }
     public void setRemitente(String remitente) { this.remitente = remitente; }
@@ -61,8 +62,8 @@ public class Mensaje {
     public String toString() {
         return "Mensaje{" +
                 "id=" + id +
-                ", idUsuarioComun=" + idUsuarioComun +
-                ", idUsuarioTrabajador=" + idUsuarioTrabajador +
+                ", usuarioComun=" + (usuarioComun != null ? usuarioComun.getId() : null) +
+                ", usuarioTrabajador=" + (usuarioTrabajador != null ? usuarioTrabajador.getId() : null) +
                 ", remitente='" + remitente + '\'' +
                 ", contenido='" + contenido + '\'' +
                 ", fechaEnvio=" + fechaEnvio +

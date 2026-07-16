@@ -1,13 +1,23 @@
 package org.generation.fyndr.dto;
 
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class TrabajadorDTO {
 
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String nombre;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El formato del email es inválido")
     private String email;
+
+    @NotBlank(message = "El teléfono es obligatorio")
+    @Pattern(regexp = "^[0-9]{10,15}$", message = "El teléfono debe contener entre 10 y 15 dígitos numéricos")
     private String telefono;
+
     private String contrasena;
     private LocalDate fechaNacimiento;
     private String inePath;
@@ -15,9 +25,13 @@ public class TrabajadorDTO {
     private String fotografiaPath;
     private String comprobantePath;
     private String antecedentesPath;
+
+    @Min(value = 0, message = "Los años de experiencia no pueden ser negativos")
     private Integer experienciaAnos;
+
     private String descripcion;
     private String subspecialidades;
+    private String direccion;
     private String certificacionesPath;
     private String portafolioPath;
     private String rfc;
@@ -156,6 +170,14 @@ public class TrabajadorDTO {
 
     public void setSubspecialidades(String subspecialidades) {
         this.subspecialidades = subspecialidades;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 
     public String getCertificacionesPath() {

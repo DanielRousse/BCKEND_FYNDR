@@ -3,9 +3,6 @@ package org.generation.fyndr.modelos;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * Clase que representa a una publicacion en el sistema Fyndr.
- */
 @Entity
 @Table(name = "publicaciones")
 public class Publicacion {
@@ -26,67 +23,37 @@ public class Publicacion {
     @Column(name = "fecha_publicacion", nullable = false)
     private LocalDateTime fechaPublicacion;
 
-    @Column(name = "id_usuario_trabajador", nullable = false)
-    private Long idUsuarioTrabajador;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_trabajador", nullable = false)
+    private UsuarioTrabajador usuarioTrabajador;
 
-    public Publicacion() {
-    } // Publicacion
+    public Publicacion() {}
 
-    public Publicacion(String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, Long idUsuarioTrabajador) {
+    public Publicacion(String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, UsuarioTrabajador usuarioTrabajador) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.precio = precio;
         this.fechaPublicacion = fechaPublicacion;
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
-    } // Publicacion
+        this.usuarioTrabajador = usuarioTrabajador;
+    }
 
-    public Long getId() {
-        return id;
-    } // getId
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    } // setId
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
 
-    public String getTitulo() {
-        return titulo;
-    } // getTitulo
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    } // setTitulo
+    public Double getPrecio() { return precio; }
+    public void setPrecio(Double precio) { this.precio = precio; }
 
-    public String getDescripcion() {
-        return descripcion;
-    } // getDescripcion
+    public LocalDateTime getFechaPublicacion() { return fechaPublicacion; }
+    public void setFechaPublicacion(LocalDateTime fechaPublicacion) { this.fechaPublicacion = fechaPublicacion; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    } // setDescripcion
-
-    public Double getPrecio() {
-        return precio;
-    } // getPrecio
-
-    public void setPrecio(Double precio) {
-        this.precio = precio;
-    } // setPrecio
-
-    public LocalDateTime getFechaPublicacion() {
-        return fechaPublicacion;
-    } // getFechaPublicacion
-
-    public void setFechaPublicacion(LocalDateTime fechaPublicacion) {
-        this.fechaPublicacion = fechaPublicacion;
-    } // setFechaPublicacion
-
-    public Long getIdUsuarioTrabajador() {
-        return idUsuarioTrabajador;
-    } // getIdUsuarioTrabajador
-
-    public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) {
-        this.idUsuarioTrabajador = idUsuarioTrabajador;
-    } // setIdUsuarioTrabajador
+    public UsuarioTrabajador getUsuarioTrabajador() { return usuarioTrabajador; }
+    public void setUsuarioTrabajador(UsuarioTrabajador usuarioTrabajador) { this.usuarioTrabajador = usuarioTrabajador; }
 
     @Override
     public String toString() {
@@ -96,7 +63,7 @@ public class Publicacion {
                 ", descripcion='" + descripcion + '\'' +
                 ", precio=" + precio +
                 ", fechaPublicacion=" + fechaPublicacion +
-                ", idUsuarioTrabajador=" + idUsuarioTrabajador +
+                ", usuarioTrabajador=" + (usuarioTrabajador != null ? usuarioTrabajador.getId() : null) +
                 '}';
-    } // toString
-} // class Publicacion
+    }
+}

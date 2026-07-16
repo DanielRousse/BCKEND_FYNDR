@@ -4,6 +4,7 @@ import org.generation.fyndr.dto.TrabajadorDTO;
 import org.generation.fyndr.modelos.UsuarioTrabajador;
 import org.generation.fyndr.servicios.UsuarioTrabajadorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +24,13 @@ public class UsuarioTrabajadorController {
     } // UsuarioTrabajadorController
 
     @GetMapping
-    public List<UsuarioTrabajador> getTrabajadores() {
+    public List<UsuarioTrabajador> getTrabajadores(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
         // GET http://localhost:8080/api/usuarios-trabajadores/
+        if (page != null && size != null) {
+            return service.getEntidadesPaginadas(page, size).getContent();
+        }
         return service.getEntidades();
     } // getTrabajadores
 
@@ -35,13 +41,13 @@ public class UsuarioTrabajadorController {
     } // getTrabajador
 
     @PostMapping
-    public UsuarioTrabajador crearTrabajador(@RequestBody UsuarioTrabajador trabajador) {
+    public UsuarioTrabajador crearTrabajador(@Valid @RequestBody UsuarioTrabajador trabajador) {
         // POST http://localhost:8080/api/usuarios-trabajadores/
         return service.crearEntidad(trabajador);
     } // crearTrabajador
 
     @PutMapping(path="{entidadId}")
-    public UsuarioTrabajador actualizarTrabajador(@PathVariable("entidadId") Long id, @RequestBody TrabajadorDTO dto) {
+    public UsuarioTrabajador actualizarTrabajador(@PathVariable("entidadId") Long id, @Valid @RequestBody TrabajadorDTO dto) {
         // PUT http://localhost:8080/api/usuarios-trabajadores/1
         return service.actualizarEntidad(id, dto);
     } // actualizarTrabajador

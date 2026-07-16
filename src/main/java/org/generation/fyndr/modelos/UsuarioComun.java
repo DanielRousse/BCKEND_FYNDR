@@ -2,6 +2,9 @@ package org.generation.fyndr.modelos;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,26 +18,53 @@ public class UsuarioComun {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario_comun")
-    private Integer id;
+    private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El formato del email es inválido")
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @NotBlank(message = "El teléfono es obligatorio")
+    @Pattern(regexp = "^[0-9]{10,15}$", message = "El teléfono debe contener entre 10 y 15 dígitos numéricos")
     @Column(nullable = false, length = 15)
     private String telefono;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, length = 255)
     private String contrasena;
 
     @Column(name = "fecha_registro", insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaRegistro;
 
+    @Column(name = "fotografia_path", columnDefinition = "LONGTEXT")
+    private String fotografiaPath;
+
     @OneToMany(mappedBy = "usuarioComun", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value = "usuarioComun-resena")
     private List<Resena> resenas;
+
+    @OneToMany(mappedBy = "usuarioComun", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Contratacion> contrataciones;
+
+    @OneToMany(mappedBy = "usuarioComun", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Mensaje> mensajes;
+
+    @ManyToMany
+    @JoinTable(
+        name = "favoritos",
+        joinColumns = @JoinColumn(name = "id_usuario_comun"),
+        inverseJoinColumns = @JoinColumn(name = "id_usuario_trabajador")
+    )
+    @JsonIgnore
+    private List<UsuarioTrabajador> favoritos;
 
     public UsuarioComun() {
     } // UsuarioComun
@@ -47,7 +77,7 @@ public class UsuarioComun {
         this.fechaRegistro = fechaRegistro;
     } // UsuarioComun
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     } // getId
 
@@ -99,6 +129,38 @@ public class UsuarioComun {
         this.resenas = resenas;
     } // setResenas
 
+    public List<Contratacion> getContrataciones() {
+        return contrataciones;
+    }
+
+    public void setContrataciones(List<Contratacion> contrataciones) {
+        this.contrataciones = contrataciones;
+    }
+
+    public List<Mensaje> getMensajes() {
+        return mensajes;
+    }
+
+    public void setMensajes(List<Mensaje> mensajes) {
+        this.mensajes = mensajes;
+    }
+
+    public List<UsuarioTrabajador> getFavoritos() {
+        return favoritos;
+    }
+
+    public void setFavoritos(List<UsuarioTrabajador> favoritos) {
+        this.favoritos = favoritos;
+    }
+
+    public String getFotografiaPath() {
+        return fotografiaPath;
+    }
+
+    public void setFotografiaPath(String fotografiaPath) {
+        this.fotografiaPath = fotografiaPath;
+    }
+
     @Override
     public String toString() {
         return "UsuarioComun{" +
@@ -106,7 +168,6 @@ public class UsuarioComun {
                 ", nombre='" + nombre + '\'' +
                 ", email='" + email + '\'' +
                 ", telefono='" + telefono + '\'' +
-                ", contrasena='" + contrasena + '\'' +
                 ", fechaRegistro=" + fechaRegistro +
                 '}';
     } // toString

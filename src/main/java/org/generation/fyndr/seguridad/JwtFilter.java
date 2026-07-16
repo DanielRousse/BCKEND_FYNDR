@@ -1,6 +1,10 @@
 package org.generation.fyndr.seguridad;
 
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,10 +36,15 @@ public class JwtFilter implements Filter {
             return;
         } // CORS preflight
 
-        // 2. Permitir el registro de usuarios y el inicio de sesión
-        // POST /api/login
-        // POST /api/usuarios-comunes/
-        // POST /api/usuarios-trabajadores/
+        // 2. Whitelist de endpoints públicos
+        // - POST /api/login (Inicio de sesión)
+        // - POST /api/usuarios-comunes y /api/usuarios-trabajadores (Registro de usuarios)
+        // - GET /api/usuarios-trabajadores/** (Búsqueda y detalle de profesionales)
+        // - GET /api/publicaciones/** (Ver publicaciones)
+        // - GET /api/resenas/** (Ver reseñas)
+        // - GET /api/profesiones/** (Ver profesiones)
+        // - Endpoints de Actuator (/actuator/health, /actuator/info)
+        
         if ("POST".equalsIgnoreCase(method)) {
             if (path.endsWith("/api/login") || path.endsWith("/api/login/") || 
                 path.endsWith("/api/usuarios-comunes") || path.endsWith("/api/usuarios-comunes/") ||
@@ -43,7 +52,18 @@ public class JwtFilter implements Filter {
                 chain.doFilter(request, response);
                 return;
             }
-        } // public endpoints
+        }
+
+        if ("GET".equalsIgnoreCase(method)) {
+            if (path.contains("/api/usuarios-trabajadores") || 
+                path.contains("/api/publicaciones") || 
+                path.contains("/api/resenas") || 
+                path.contains("/api/profesiones") || 
+                path.contains("/actuator/")) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
 
         // 3. Validar token para todos los demás endpoints
         String authHeader = httpRequest.getHeader("Authorization");
@@ -59,7 +79,11 @@ public class JwtFilter implements Filter {
 
         try {
             if (jwtUtil.validateTokenWithoutEmail(token)) {
-                // Token es válido, continuar la cadena de filtros
+                // Agregar atributos del token a la petición para facilitar el acceso en controladores/servicios
+                httpRequest.setAttribute("userEmail", jwtUtil.extractEmail(token));
+                httpRequest.setAttribute("userRole", jwtUtil.extractRole(token));
+                httpRequest.setAttribute("userId", jwtUtil.extractId(token));
+                
                 chain.doFilter(request, response);
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

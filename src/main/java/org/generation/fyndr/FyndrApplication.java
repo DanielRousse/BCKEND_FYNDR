@@ -27,6 +27,8 @@ public class FyndrApplication {
 		registrationBean.addUrlPatterns("/api/profesiones/*");
 		registrationBean.addUrlPatterns("/api/publicaciones/*");
 		registrationBean.addUrlPatterns("/api/resenas/*");
+		registrationBean.addUrlPatterns("/api/auth/*");
+		registrationBean.addUrlPatterns("/api/favoritos/*");
 		
 		return registrationBean;
 	} // filterRegistrationBean

@@ -4,8 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,18 +20,26 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // Clave secreta para firmar los tokens (mínimo 32 caracteres / 256 bits para HS256)
-    private static final String SECRET_KEY_STR = "EstaEsUnaClaveSecretaMuyLargaYSeguraParaMapearLosTokensDeJWTFyndr123!";
-    private static final Key KEY = Keys.hmacShaKeyFor(SECRET_KEY_STR.getBytes());
+    @Value("${jwt.secret-key}")
+    private String secretKeyStr;
 
-    // Tiempo de expiración del token (10 horas)
-    private static final long EXPIRATION_TIME = 1000L * 60 * 60 * 10;
+    @Value("${jwt.expiration-ms}")
+    private long expirationMs;
+
+    private Key key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secretKeyStr.getBytes());
+    }
 
     /**
-     * Genera un token JWT para el email proporcionado.
+     * Genera un token JWT para el email proporcionado con claims de rol e ID.
      */
-    public String generateToken(String email) {
+    public String generateToken(String email, String role, Long id) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+        claims.put("id", id);
         return createToken(claims, email);
     } // generateToken
 
@@ -38,25 +48,17 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(KEY, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     } // createToken
 
     /**
-     * Valida si el token es correcto y corresponde al email del usuario.
-     */
-    public Boolean validateToken(String token, String email) {
-        final String extractedEmail = extractEmail(token);
-        return (extractedEmail.equals(email) && !isTokenExpired(token));
-    } // validateToken
-
-    /**
-     * Valida si el token es válido y no ha expirado (sin importar el email).
+     * Valida si el token es válido y no ha expirado.
      */
     public Boolean validateTokenWithoutEmail(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(KEY).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return !isTokenExpired(token);
         } catch (Exception e) {
             return false;
@@ -69,6 +71,20 @@ public class JwtUtil {
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     } // extractEmail
+
+    /**
+     * Extrae el rol del token.
+     */
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    } // extractRole
+
+    /**
+     * Extrae el ID del token.
+     */
+    public Long extractId(String token) {
+        return extractClaim(token, claims -> claims.get("id", Long.class));
+    } // extractId
 
     /**
      * Extrae la fecha de expiración del token.
@@ -84,7 +100,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(KEY)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
