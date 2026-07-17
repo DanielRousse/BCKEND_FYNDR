@@ -101,20 +101,13 @@ public class ResenaService {
 
     private void recalcularCalificacionTrabajador(UsuarioTrabajador trabajador) {
         if (trabajador == null) return;
-        List<Resena> resenas = resenaRepository.findAll();
-        double sum = 0;
-        int count = 0;
-        for (Resena r : resenas) {
-            if (r.getUsuarioTrabajador() != null && r.getUsuarioTrabajador().getId().equals(trabajador.getId())) {
-                sum += r.getCalificacion();
-                count++;
-            }
-        }
-        if (count > 0) {
-            trabajador.setCalificacionPromedio(java.math.BigDecimal.valueOf(sum / count));
+        Double avg = resenaRepository.calcularPromedioByTrabajador(trabajador.getId());
+        if (avg != null) {
+            trabajador.setCalificacionPromedio(java.math.BigDecimal.valueOf(avg));
         } else {
             trabajador.setCalificacionPromedio(java.math.BigDecimal.valueOf(5.0));
         }
         usuarioTrabajadorRepository.save(trabajador);
+        logger.info("Calificación promedio recalculada para trabajador id={}: {}", trabajador.getId(), trabajador.getCalificacionPromedio());
     }
 }

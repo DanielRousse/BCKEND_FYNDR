@@ -8,6 +8,8 @@ import org.generation.fyndr.modelos.UsuarioTrabajador;
 import org.generation.fyndr.repositorios.ContratacionRepository;
 import org.generation.fyndr.repositorios.UsuarioComunRepository;
 import org.generation.fyndr.repositorios.UsuarioTrabajadorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class ContratacionService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ContratacionService.class);
     private final ContratacionRepository contratacionRepository;
     private final UsuarioComunRepository usuarioComunRepository;
     private final UsuarioTrabajadorRepository usuarioTrabajadorRepository;
@@ -49,6 +52,7 @@ public class ContratacionService {
 
         Contratacion c = new Contratacion(uc, ut, dto.getFechaContratacion(), dto.getEstado());
         Contratacion saved = contratacionRepository.save(c);
+        logger.info("Contratación creada: id={}, usuario={}, trabajador={}", saved.getId(), uc.getId(), ut.getId());
         return convertToResponseDTO(saved);
     }
 

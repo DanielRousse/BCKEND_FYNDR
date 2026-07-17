@@ -6,6 +6,8 @@ import org.generation.fyndr.modelos.Publicacion;
 import org.generation.fyndr.modelos.UsuarioTrabajador;
 import org.generation.fyndr.repositorios.PublicacionRepository;
 import org.generation.fyndr.repositorios.UsuarioTrabajadorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class PublicacionService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PublicacionService.class);
     private final PublicacionRepository publicacionRepository;
     private final UsuarioTrabajadorRepository usuarioTrabajadorRepository;
 
@@ -55,6 +58,7 @@ public class PublicacionService {
         p.setImagenPath(dto.getImagenPath());
 
         Publicacion saved = publicacionRepository.save(p);
+        logger.info("Publicación creada: id={}, título='{}', trabajadorId={}", saved.getId(), saved.getTitulo(), ut.getId());
         return convertToResponseDTO(saved);
     } // crearEntidad
 
@@ -62,8 +66,10 @@ public class PublicacionService {
         Publicacion p = publicacionRepository.findById(id).orElse(null);
         if (p != null) {
             publicacionRepository.deleteById(id);
+            logger.info("Publicación eliminada: id={}", id);
             return convertToResponseDTO(p);
         }
+        logger.warn("Intento de eliminar publicación inexistente: id={}", id);
         return null;
     } // deleteEntidad
 

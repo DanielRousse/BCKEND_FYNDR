@@ -1,44 +1,51 @@
 package org.generation.fyndr.servicios;
 
 import org.generation.fyndr.dto.TrabajadorDTO;
+import org.generation.fyndr.modelos.Profesion;
 import org.generation.fyndr.modelos.UsuarioTrabajador;
+import org.generation.fyndr.repositorios.ProfesionRepository;
 import org.generation.fyndr.repositorios.UsuarioTrabajadorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Servicio para gestionar las operaciones de los usuarios trabajadores en memoria local.
+ * Servicio para gestionar las operaciones de los usuarios trabajadores.
  */
 @Service
 public class UsuarioTrabajadorService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioTrabajadorService.class);
+
     private final UsuarioTrabajadorRepository repository;
+    private final ProfesionRepository profesionRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UsuarioTrabajadorService(UsuarioTrabajadorRepository repository) {
+    public UsuarioTrabajadorService(UsuarioTrabajadorRepository repository, ProfesionRepository profesionRepository) {
         this.repository = repository;
+        this.profesionRepository = profesionRepository;
     }
 
     public List<UsuarioTrabajador> getEntidades() {
+        logger.info("Obteniendo todos los usuarios trabajadores");
         return repository.findAll();
     } // getEntidades
 
     public org.springframework.data.domain.Page<UsuarioTrabajador> getEntidadesPaginadas(int page, int size) {
+        logger.info("Obteniendo trabajadores paginados: page={}, size={}", page, size);
         return repository.findAll(org.springframework.data.domain.PageRequest.of(page, size));
     } // getEntidadesPaginadas
 
     public UsuarioTrabajador getEntidad(Long id) {
+        logger.info("Buscando usuario trabajador con id: {}", id);
         return repository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("El usuario-trabajador con el id [" + id + "] no existe"));
     } // getEntidad
@@ -49,7 +56,9 @@ public class UsuarioTrabajadorService {
         if(usr.isEmpty()){
             obj.setContrasena(passwordEncoder.encode(obj.getContrasena()));
             repository.save(obj);
+            logger.info("Usuario trabajador creado: {}", obj.getEmail());
         }else{
+            logger.warn("Intento de crear usuario trabajador con email duplicado: {}", obj.getEmail());
             obj=null;
         }
         return obj;
@@ -60,6 +69,9 @@ public class UsuarioTrabajadorService {
         if(repository.existsById(id)){
             usr = repository.findById(id).get();
             repository.deleteById(id);
+            logger.info("Usuario trabajador eliminado: id={}", id);
+        } else {
+            logger.warn("Intento de eliminar usuario trabajador inexistente: id={}", id);
         }
         return usr;
     } // deleteEntidad
@@ -135,12 +147,65 @@ public class UsuarioTrabajadorService {
                 if (dto.getDireccion() != null) {
                     t.setDireccion(dto.getDireccion());
                 } // if
+                if (dto.getLatitud() != null) {
+                    t.setLatitud(dto.getLatitud());
+                } // if
+                if (dto.getLongitud() != null) {
+                    t.setLongitud(dto.getLongitud());
+                } // if
 
                 trabajador = repository.save(t);
+                logger.info("Usuario trabajador actualizado: id={}", id);
 
-
+            } else {
+                logger.warn("Intento de actualizar usuario trabajador inexistente: id={}", id);
             } // if
 
         return trabajador;
     } // actualizarEntidad
+
+    /**
+     * Busca trabajadores por profesión.
+     */
+    public List<UsuarioTrabajador> buscarPorProfesion(Long profesionId) {
+        logger.info("Buscando trabajadores por profesión id={}", profesionId);
+        return repository.findByProfesiones_Id(profesionId);
+    }
+
+    /**
+     * Asigna una profesión a un trabajador.
+     */
+    public UsuarioTrabajador asignarProfesion(Long trabajadorId, Long profesionId) {
+        UsuarioTrabajador trabajador = repository.findById(trabajadorId)
+                .orElseThrow(() -> new RuntimeException("Usuario trabajador no encontrado con id: " + trabajadorId));
+        Profesion profesion = profesionRepository.findById(profesionId)
+                .orElseThrow(() -> new RuntimeException("Profesión no encontrada con id: " + profesionId));
+
+        if (!trabajador.getProfesiones().contains(profesion)) {
+            trabajador.getProfesiones().add(profesion);
+            repository.save(trabajador);
+            logger.info("Profesión id={} asignada a trabajador id={}", profesionId, trabajadorId);
+        } else {
+            logger.info("Profesión id={} ya estaba asignada a trabajador id={}", profesionId, trabajadorId);
+        }
+        return trabajador;
+    }
+
+    /**
+     * Desasigna una profesión de un trabajador.
+     */
+    public UsuarioTrabajador desasignarProfesion(Long trabajadorId, Long profesionId) {
+        UsuarioTrabajador trabajador = repository.findById(trabajadorId)
+                .orElseThrow(() -> new RuntimeException("Usuario trabajador no encontrado con id: " + trabajadorId));
+        Profesion profesion = profesionRepository.findById(profesionId)
+                .orElseThrow(() -> new RuntimeException("Profesión no encontrada con id: " + profesionId));
+
+        if (trabajador.getProfesiones().remove(profesion)) {
+            repository.save(trabajador);
+            logger.info("Profesión id={} desasignada de trabajador id={}", profesionId, trabajadorId);
+        } else {
+            logger.warn("Profesión id={} no estaba asignada a trabajador id={}", profesionId, trabajadorId);
+        }
+        return trabajador;
+    }
 } // class UsuarioTrabajadorService

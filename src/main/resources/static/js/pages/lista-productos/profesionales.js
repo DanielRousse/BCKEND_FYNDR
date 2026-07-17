@@ -1,8 +1,13 @@
+import { geocodeAddress } from '../../geocoding.js';
+
 let profesionalesData = [];
-
-
 let profesionalesVisibles = 6;
 let listaFiltradaActual = [];
+
+let listMap = null;
+let listMarkersGroup = null;
+let clientCoordinates = null;
+let geocodeTimeout = null;
 
 
 export function renderProfesionales() {
@@ -83,6 +88,11 @@ export function renderProfesionales() {
                             Limpiar filtros
                         </button>
                     </div>
+                    
+                    <!-- Mapa de Profesionales -->
+                    <div class="card p-2 shadow-sm mt-3" style="border-radius: 12px; height: 260px;" id="mapa-profesionales-container">
+                        <div id="mapa-profesionales" style="height: 100%; border-radius: 8px; z-index: 1;"></div>
+                    </div>
                 </div>
 
             </div>
@@ -134,7 +144,9 @@ function cargarProfesionalesDesdeBD() {
                         resenas: numResenas,
                         precio: tarifa,
                         img: imgPath,
-                        direccion: direccionStr
+                        direccion: direccionStr,
+                        latitud: trabajador.latitud,
+                        longitud: trabajador.longitud
                     };
                 });
                 listaFiltradaActual = [...profesionalesData];
@@ -150,6 +162,10 @@ function cargarProfesionalesDesdeBD() {
 function inicializarLogicaProfesionales() {
     profesionalesVisibles = 6;
     cargarProfesionalesDesdeBD();
+
+    if (window.L) {
+        inicializarMapa();
+    }
 
     const catMas = document.getElementById("cat-mas");
     const catServices = document.querySelectorAll(".cat-service");
@@ -224,18 +240,18 @@ function inicializarLogicaProfesionales() {
     if (inputUbicacion && inputFiltroUbicacion) {
         inputUbicacion.addEventListener("input", (e) => {
             inputFiltroUbicacion.value = e.target.value;
-            ejecutarFlujoFiltrado();
+            actualizarCoordenadasYFiltrar(e.target.value);
         });
         inputFiltroUbicacion.addEventListener("input", (e) => {
             inputUbicacion.value = e.target.value;
-            ejecutarFlujoFiltrado();
+            actualizarCoordenadasYFiltrar(e.target.value);
         });
     } else {
         if (inputUbicacion) {
-            inputUbicacion.addEventListener("input", ejecutarFlujoFiltrado);
+            inputUbicacion.addEventListener("input", (e) => actualizarCoordenadasYFiltrar(e.target.value));
         }
         if (inputFiltroUbicacion) {
-            inputFiltroUbicacion.addEventListener("input", ejecutarFlujoFiltrado);
+            inputFiltroUbicacion.addEventListener("input", (e) => actualizarCoordenadasYFiltrar(e.target.value));
         }
     }
 
@@ -245,12 +261,12 @@ function inicializarLogicaProfesionales() {
         inputFiltroDistancia.addEventListener("input", ejecutarFlujoFiltrado);
     }
 
-    const btnLimpiar = document.getElementById("btn-limpiar-filtros");
     if (btnLimpiar) {
         btnLimpiar.addEventListener("click", () => {
             document.getElementById("precio-min").value = "";
             document.getElementById("precio-max").value = "";
             document.getElementById("select-calificacion").value = "0";
+            
             const fUbi = document.getElementById("filtro-ubicacion");
             if (fUbi) fUbi.value = "";
             const fDist = document.getElementById("filtro-distancia");
@@ -261,6 +277,7 @@ function inicializarLogicaProfesionales() {
             if (bServ) bServ.value = "";
             document.querySelectorAll(".chk-servicio").forEach(cb => cb.checked = false);
 
+            clientCoordinates = null;
             listaFiltradaActual = [...profesionalesData];
             profesionalesVisibles = 6;
             renderizarSegmento();
@@ -315,11 +332,9 @@ function ejecutarFlujoFiltrado() {
     const precioMax = parseFloat(document.getElementById("precio-max").value) || Infinity;
     const calificacionMin = parseFloat(document.getElementById("select-calificacion").value) || 0;
 
-    // Buscar en inputs del banner y filtro lateral
     const queryServicio = (document.getElementById("servicio")?.value || "").trim().toLowerCase();
     const queryUbicacion = (document.getElementById("ubicacion")?.value || document.getElementById("filtro-ubicacion")?.value || "").trim().toLowerCase();
 
-    // Filtro por distancia en km
     const inputDistancia = document.getElementById("filtro-distancia");
     const maxDistancia = parseFloat(inputDistancia?.value) || Infinity;
 
@@ -328,11 +343,15 @@ function ejecutarFlujoFiltrado() {
         const cumpleServicioQuery = !queryServicio || pro.servicio.toLowerCase().includes(queryServicio) || pro.nombre.toLowerCase().includes(queryServicio);
         const cumplePrecio = pro.precio >= precioMin && pro.precio <= precioMax;
         const cumpleStars = pro.calificacion >= calificacionMin;
+        
         let cumpleUbicacion = true;
         if (queryUbicacion) {
             if (maxDistancia !== Infinity) {
-                const coordCliente = obtenerCoordenadas(queryUbicacion);
-                const coordPro = obtenerCoordenadas(pro.direccion);
+                const coordCliente = clientCoordinates || obtenerCoordenadas(queryUbicacion);
+                const coordPro = {
+                    lat: pro.latitud || obtenerCoordenadas(pro.direccion).lat,
+                    lon: pro.longitud || obtenerCoordenadas(pro.direccion).lon
+                };
                 const dist = calcularDistanciaKm(coordCliente.lat, coordCliente.lon, coordPro.lat, coordPro.lon);
                 cumpleUbicacion = dist <= maxDistancia;
             } else {
@@ -359,8 +378,14 @@ function renderizarSegmento() {
     if (segmentoAMostrar.length === 0) {
         grid.innerHTML = `<div class="col-12 text-center py-4 text-muted"><p>No se encontraron profesionales que coincidan.</p></div>`;
         if (btnCargarMas) btnCargarMas.style.display = "none";
+        
+        if (listMarkersGroup) {
+            listMarkersGroup.clearLayers();
+        }
         return;
     }
+
+    const bounds = [];
 
     segmentoAMostrar.forEach(pro => {
         const col = document.createElement("div");
@@ -408,7 +433,28 @@ function renderizarSegmento() {
         }
 
         grid.appendChild(col);
+
+        // Mapa markers logic
+        if (listMarkersGroup) {
+            const lat = pro.latitud || obtenerCoordenadas(pro.direccion).lat;
+            const lon = pro.longitud || obtenerCoordenadas(pro.direccion).lon;
+            const marker = L.marker([lat, lon]).bindPopup(`
+                <strong>${pro.nombre}</strong><br>
+                <small>${pro.servicio}</small><br>
+                <a href="#perfil-profesional/${pro.id}" class="btn btn-xs btn-primary text-white py-0 px-2 mt-1" style="font-size: 0.75rem;">Ver Perfil</a>
+            `);
+            listMarkersGroup.addLayer(marker);
+            bounds.push([lat, lon]);
+        }
     });
+
+    if (listMap && bounds.length > 0) {
+        try {
+            listMap.fitBounds(bounds, { padding: [20, 20] });
+        } catch (e) {
+            console.error("Error setting map bounds:", e);
+        }
+    }
 
     if (btnCargarMas) {
         if (profesionalesVisibles >= listaFiltradaActual.length) {
@@ -417,4 +463,42 @@ function renderizarSegmento() {
             btnCargarMas.style.display = "inline-block";
         }
     }
+}
+
+function inicializarMapa() {
+    const mapDiv = document.getElementById("mapa-profesionales");
+    if (!mapDiv) return;
+
+    if (listMap) {
+        listMap.remove();
+    }
+
+    try {
+        listMap = L.map('mapa-profesionales').setView([19.4326, -99.1332], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(listMap);
+
+        listMarkersGroup = L.layerGroup().addTo(listMap);
+    } catch (e) {
+        console.error("Error initializing Leaflet map in list:", e);
+    }
+}
+
+function actualizarCoordenadasYFiltrar(address) {
+    if (geocodeTimeout) clearTimeout(geocodeTimeout);
+
+    if (!address.trim()) {
+        clientCoordinates = null;
+        ejecutarFlujoFiltrado();
+        return;
+    }
+
+    geocodeTimeout = setTimeout(async () => {
+        const coords = await geocodeAddress(address);
+        if (coords) {
+            clientCoordinates = coords;
+        }
+        ejecutarFlujoFiltrado();
+    }, 500);
 }

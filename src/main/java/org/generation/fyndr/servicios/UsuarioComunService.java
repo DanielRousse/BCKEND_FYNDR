@@ -2,6 +2,8 @@ package org.generation.fyndr.servicios;
 
 import org.generation.fyndr.modelos.UsuarioComun;
 import org.generation.fyndr.repositorios.UsuarioComunRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 @Service
 public class UsuarioComunService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioComunService.class);
     private final UsuarioComunRepository repository;
     private final PasswordEncoder passwordEncoder;
 
@@ -33,15 +36,19 @@ public class UsuarioComunService {
 
     public UsuarioComun crearEntidad(UsuarioComun obj) {
         obj.setContrasena(passwordEncoder.encode(obj.getContrasena()));
-        return repository.save(obj);
+        UsuarioComun saved = repository.save(obj);
+        logger.info("Usuario común creado: id={}, email='{}'", saved.getId(), saved.getEmail());
+        return saved;
     } // crearEntidad
 
     public UsuarioComun deleteEntidad(Long id) {
         UsuarioComun ref = getEntidad(id);
         if (ref != null) {
             repository.delete(ref);
+            logger.info("Usuario común eliminado: id={}", id);
             return ref;
         } // if
+        logger.warn("Intento de eliminar usuario común inexistente: id={}", id);
         return null;
     } // deleteEntidad
 
@@ -63,8 +70,11 @@ public class UsuarioComunService {
             if (fotografiaPath != null) {
                 u.setFotografiaPath(fotografiaPath);
             } // if
-            return repository.save(u);
+            UsuarioComun updated = repository.save(u);
+            logger.info("Usuario común actualizado: id={}", updated.getId());
+            return updated;
         } // if
+        logger.warn("Intento de actualizar usuario común inexistente: id={}", id);
         return null;
     } // actualizarEntidad
 } // class UsuarioComunService

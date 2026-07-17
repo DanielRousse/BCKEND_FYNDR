@@ -40,6 +40,8 @@ public class TrabajadorDTO {
     private String banco;
     private BigDecimal tarifaHora;
     private BigDecimal calificacionPromedio;
+    private Double latitud;
+    private Double longitud;
 
     public TrabajadorDTO(String nombre, String email, String telefono, String contrasena, LocalDate fechaNacimiento, String inePath, String curp, String fotografiaPath, String comprobantePath, String antecedentesPath, Integer experienciaAnos, String descripcion, String subspecialidades, String certificacionesPath, String portafolioPath, String rfc, String constanciaFiscalPath, String clabe, String banco, BigDecimal tarifaHora, BigDecimal calificacionPromedio) {
         this.nombre = nombre;
@@ -242,6 +244,22 @@ public class TrabajadorDTO {
 
     public void setCalificacionPromedio(BigDecimal calificacionPromedio) {
         this.calificacionPromedio = calificacionPromedio;
+    }
+
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
     }
 
     @Override

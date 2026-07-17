@@ -59,7 +59,9 @@ public class JwtFilter implements Filter {
                 path.contains("/api/publicaciones") || 
                 path.contains("/api/resenas") || 
                 path.contains("/api/profesiones") || 
-                path.contains("/actuator/")) {
+                path.contains("/actuator/") ||
+                path.contains("/swagger-ui") ||
+                path.contains("/v3/api-docs")) {
                 chain.doFilter(request, response);
                 return;
             }

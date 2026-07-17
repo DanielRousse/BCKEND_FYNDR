@@ -20,6 +20,12 @@ export function renderPerfilProfesionalPage(id) {
                             <button id="btn-contratar" class="btn btn-primary btn-custom py-2" style="border-radius: 8px;">Contratar Servicio</button>
                             <button id="btn-chatear" class="btn btn-outline-secondary py-2" style="border-radius: 8px;">Enviar Mensaje</button>
                         </div>
+                        
+                        <!-- Mini mapa de ubicación -->
+                        <div class="mt-4 text-start">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i>Zona de Cobertura</h6>
+                            <div id="mini-mapa-profesional" style="height: 180px; border-radius: 8px; border: 1px solid #ddd; z-index: 1;"></div>
+                        </div>
                     </div>
                 </div>
                 
@@ -68,6 +74,64 @@ export function initPerfilProfesionalPage(id) {
                     } else {
                         document.getElementById('perf-foto').src = `./assets/juan.svg`;
                     }
+                }
+
+                // Inicializar mini-mapa si Leaflet está cargado
+                if (window.L) {
+                    setTimeout(() => {
+                        const mapContainer = document.getElementById('mini-mapa-profesional');
+                        if (mapContainer) {
+                            let lat = match.latitud;
+                            let lon = match.longitud;
+                            
+                            // fallback determinista si no tiene coordenadas reales en BD
+                            if (!lat || !lon) {
+                                const dir = (match.direccion || "").toLowerCase();
+                                const COORD_MAP = {
+                                    "cdmx": { lat: 19.4326, lon: -99.1332 },
+                                    "centro": { lat: 19.4326, lon: -99.1332 },
+                                    "reforma": { lat: 19.4270, lon: -99.1677 },
+                                    "guadalajara": { lat: 20.6597, lon: -103.3496 },
+                                    "monterrey": { lat: 25.6866, lon: -100.3161 },
+                                    "puebla": { lat: 19.0413, lon: -98.2062 },
+                                    "queretaro": { lat: 20.5888, lon: -100.3899 },
+                                    "merida": { lat: 20.9674, lon: -89.5926 }
+                                };
+                                let resolved = false;
+                                for (const key in COORD_MAP) {
+                                    if (dir.includes(key)) {
+                                        lat = COORD_MAP[key].lat;
+                                        lon = COORD_MAP[key].lon;
+                                        resolved = true;
+                                        break;
+                                    }
+                                }
+                                if (!resolved) {
+                                    let hash = 0;
+                                    for (let i = 0; i < dir.length; i++) {
+                                        hash = dir.charCodeAt(i) + ((hash << 5) - hash);
+                                    }
+                                    const latOffset = (Math.abs(hash % 100)) / 1000;
+                                    const lonOffset = (Math.abs((hash >> 8) % 100)) / 1000;
+                                    lat = 19.4326 + latOffset;
+                                    lon = -99.1332 + lonOffset;
+                                }
+                            }
+                            
+                            try {
+                                const map = L.map('mini-mapa-profesional').setView([lat, lon], 14);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                    attribution: '&copy; OpenStreetMap'
+                                }).addTo(map);
+                                
+                                L.marker([lat, lon]).addTo(map)
+                                    .bindPopup(`<strong>${match.nombre}</strong><br>${match.direccion || 'CDMX'}`)
+                                    .openPopup();
+                            } catch (e) {
+                                console.error("Error al inicializar mapa de Leaflet:", e);
+                            }
+                        }
+                    }, 100);
                 }
             } else {
                 document.getElementById('perf-nombre').textContent = 'Profesional no encontrado';

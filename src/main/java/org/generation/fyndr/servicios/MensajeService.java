@@ -8,6 +8,8 @@ import org.generation.fyndr.modelos.UsuarioTrabajador;
 import org.generation.fyndr.repositorios.MensajeRepository;
 import org.generation.fyndr.repositorios.UsuarioComunRepository;
 import org.generation.fyndr.repositorios.UsuarioTrabajadorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class MensajeService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MensajeService.class);
     private final MensajeRepository mensajeRepository;
     private final UsuarioComunRepository usuarioComunRepository;
     private final UsuarioTrabajadorRepository usuarioTrabajadorRepository;
@@ -38,6 +41,7 @@ public class MensajeService {
 
         Mensaje mensaje = new Mensaje(uc, ut, dto.getRemitente(), dto.getContenido(), dto.getFechaEnvio());
         Mensaje saved = mensajeRepository.save(mensaje);
+        logger.info("Mensaje creado: id={}, de {} para {}", saved.getId(), uc.getId(), ut.getId());
         return convertToResponseDTO(saved);
     }
 
@@ -53,15 +57,13 @@ public class MensajeService {
     }
 
     public List<MensajeResponseDTO> mensajesPorUsuarioComun(Long idUsuarioComun) {
-        return mensajeRepository.findAll().stream()
-                .filter(m -> m.getUsuarioComun().getId().equals(idUsuarioComun))
+        return mensajeRepository.findByUsuarioComunId(idUsuarioComun).stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
 
     public List<MensajeResponseDTO> mensajesPorUsuarioTrabajador(Long idUsuarioTrabajador) {
-        return mensajeRepository.findAll().stream()
-                .filter(m -> m.getUsuarioTrabajador().getId().equals(idUsuarioTrabajador))
+        return mensajeRepository.findByUsuarioTrabajadorId(idUsuarioTrabajador).stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }

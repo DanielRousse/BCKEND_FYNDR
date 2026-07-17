@@ -4,6 +4,7 @@ import org.generation.fyndr.dto.TrabajadorDTO;
 import org.generation.fyndr.modelos.UsuarioTrabajador;
 import org.generation.fyndr.servicios.UsuarioTrabajadorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,4 +58,32 @@ public class UsuarioTrabajadorController {
         // DELETE http://localhost:8080/api/usuarios-trabajadores/1
         return service.deleteEntidad(id);
     } // eliminarTrabajador
+
+    /**
+     * Buscar trabajadores por profesión.
+     */
+    @GetMapping("profesion/{profesionId}")
+    public ResponseEntity<List<UsuarioTrabajador>> buscarPorProfesion(@PathVariable("profesionId") Long profesionId) {
+        return ResponseEntity.ok(service.buscarPorProfesion(profesionId));
+    }
+
+    /**
+     * Asignar una profesión a un trabajador.
+     */
+    @PostMapping("{trabajadorId}/profesiones/{profesionId}")
+    public ResponseEntity<UsuarioTrabajador> asignarProfesion(
+            @PathVariable("trabajadorId") Long trabajadorId,
+            @PathVariable("profesionId") Long profesionId) {
+        return ResponseEntity.ok(service.asignarProfesion(trabajadorId, profesionId));
+    }
+
+    /**
+     * Desasignar una profesión de un trabajador.
+     */
+    @DeleteMapping("{trabajadorId}/profesiones/{profesionId}")
+    public ResponseEntity<UsuarioTrabajador> desasignarProfesion(
+            @PathVariable("trabajadorId") Long trabajadorId,
+            @PathVariable("profesionId") Long profesionId) {
+        return ResponseEntity.ok(service.desasignarProfesion(trabajadorId, profesionId));
+    }
 } // class UsuarioTrabajadorController

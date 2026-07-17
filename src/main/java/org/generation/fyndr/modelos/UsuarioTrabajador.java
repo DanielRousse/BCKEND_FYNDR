@@ -94,6 +94,11 @@ public class UsuarioTrabajador {
     @Column(name = "banco")
     private String banco;
 
+    @Column(name = "latitud")
+    private Double latitud;
+
+    @Column(name = "longitud")
+    private Double longitud;
     @Column(name = "tarifa_hora", precision = 10, scale = 2)
     private BigDecimal tarifaHora;
 
@@ -317,6 +322,22 @@ public class UsuarioTrabajador {
 
     public void setBanco(String banco) {
         this.banco = banco;
+    }
+
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
     }
 
     public BigDecimal getTarifaHora() {
