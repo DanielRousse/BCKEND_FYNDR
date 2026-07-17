@@ -173,6 +173,7 @@ export function renderPerfilUsuarioPage() {
 export function initPerfilUsuarioPage() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     const token = localStorage.getItem('token');
+    const userEmail = currentUser ? currentUser.email : '';
     
     if (!currentUser || !currentUser.email) {
         window.alert("Debes iniciar sesión para configurar tu perfil.");
