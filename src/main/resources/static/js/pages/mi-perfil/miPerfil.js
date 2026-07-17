@@ -161,13 +161,6 @@ export function renderPerfilUsuarioPage() {
             </div>
         </div>
     `;
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
 }
 
 export function initPerfilUsuarioPage() {
