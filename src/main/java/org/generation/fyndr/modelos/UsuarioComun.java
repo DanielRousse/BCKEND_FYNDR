@@ -45,6 +45,12 @@ public class UsuarioComun {
     @Column(name = "fotografia_path", columnDefinition = "LONGTEXT")
     private String fotografiaPath;
 
+    @Column(name = "direcciones_json", columnDefinition = "LONGTEXT")
+    private String direccionesJson;
+
+    @Column(name = "tarjetas_json", columnDefinition = "LONGTEXT")
+    private String tarjetasJson;
+
     @OneToMany(mappedBy = "usuarioComun", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference(value = "usuarioComun-resena")
     private List<Resena> resenas;
@@ -159,6 +165,22 @@ public class UsuarioComun {
 
     public void setFotografiaPath(String fotografiaPath) {
         this.fotografiaPath = fotografiaPath;
+    }
+
+    public String getDireccionesJson() {
+        return direccionesJson;
+    }
+
+    public void setDireccionesJson(String direccionesJson) {
+        this.direccionesJson = direccionesJson;
+    }
+
+    public String getTarjetasJson() {
+        return tarjetasJson;
+    }
+
+    public void setTarjetasJson(String tarjetasJson) {
+        this.tarjetasJson = tarjetasJson;
     }
 
     @Override

@@ -21,6 +21,7 @@ export function renderPerfilUsuarioPage() {
                             <button class="nav-link active text-start py-2 px-3 mb-1" id="tab-info-btn" data-bs-toggle="pill" data-bs-target="#tab-info" type="button" role="tab"><i class="bi bi-person me-2"></i>Mi Perfil</button>
                             <button class="nav-link text-start py-2 px-3 mb-1" id="tab-direcciones-btn" data-bs-toggle="pill" data-bs-target="#tab-direcciones" type="button" role="tab"><i class="bi bi-geo-alt me-2"></i>Direcciones</button>
                             <button class="nav-link text-start py-2 px-3 mb-1" id="tab-pagos-btn" data-bs-toggle="pill" data-bs-target="#tab-pagos" type="button" role="tab"><i class="bi bi-credit-card me-2"></i>Métodos de Pago</button>
+                            <button class="nav-link text-start py-2 px-3 mb-1" id="tab-pedidos-btn" data-bs-toggle="pill" data-bs-target="#tab-pedidos" type="button" role="tab"><i class="bi bi-clock-history me-2"></i>Mis Pedidos</button>
                             <button class="nav-link text-start py-2 px-3 mb-1" id="tab-seguridad-btn" data-bs-toggle="pill" data-bs-target="#tab-seguridad" type="button" role="tab"><i class="bi bi-shield-lock me-2"></i>Seguridad</button>
                             <button class="nav-link text-start py-2 px-3 mb-1 d-none" id="tab-profesional-btn" data-bs-toggle="pill" data-bs-target="#tab-profesional" type="button" role="tab"><i class="bi bi-briefcase me-2"></i>Panel Profesional</button>
                             <button class="nav-link text-start py-2 px-3 mb-1 d-none" id="tab-publicaciones-btn" data-bs-toggle="pill" data-bs-target="#tab-publicaciones" type="button" role="tab"><i class="bi bi-card-list me-2"></i>Mis Publicaciones</button>
@@ -58,65 +59,16 @@ export function renderPerfilUsuarioPage() {
                             <!-- 2. DIRECCIONES -->
                             <div class="tab-pane fade" id="tab-direcciones" role="tabpanel">
                                 <h4 class="fw-bold mb-4 text-primary">Direcciones Guardadas</h4>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <div class="card border p-3 shadow-sm h-100" style="border-radius: 8px;">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <span class="badge bg-primary">Principal</span>
-                                                <i class="bi bi-house-door text-muted" style="font-size: 1.2rem;"></i>
-                                            </div>
-                                            <h6 class="fw-bold mb-1">Domicilio Residencial</h6>
-                                            <p class="text-muted small mb-0">Calle Paseo de la Reforma 115, Col. Centro, Delegación Cuauhtémoc, CDMX, C.P. 06000</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card border p-3 shadow-sm h-100" style="border-radius: 8px; border-style: dashed !important; background-color: #fafafa; cursor: pointer;">
-                                            <div class="d-flex flex-column align-items-center justify-content-center h-100 py-3">
-                                                <i class="bi bi-plus-circle display-6 text-muted mb-2"></i>
-                                                <h6 class="fw-bold text-muted mb-0">Agregar nueva dirección</h6>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="row g-3 mb-4" id="container-direcciones">
+                                    <!-- Carga dinámica -->
                                 </div>
                             </div>
                             
                             <!-- 3. MÉTODOS DE PAGO -->
                             <div class="tab-pane fade" id="tab-pagos" role="tabpanel">
                                 <h4 class="fw-bold mb-4 text-primary">Métodos de Pago</h4>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <!-- Tarjeta de Crédito Premium -->
-                                        <div class="p-4 text-white shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); height: 180px; position: relative;">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <small class="opacity-75">FYNDR Card</small>
-                                                    <h5 class="fw-bold mb-0 mt-1">Visa Classic</h5>
-                                                </div>
-                                                <i class="bi bi-wallet2" style="font-size: 1.5rem;"></i>
-                                            </div>
-                                            <div class="my-3 text-center">
-                                                <span class="fs-5 tracking-wide">••••  ••••  ••••  4829</span>
-                                            </div>
-                                            <div class="position-absolute bottom-0 start-0 p-4 w-100 d-flex justify-content-between">
-                                                <div>
-                                                    <small class="opacity-50 text-uppercase" style="font-size: 0.65rem;">Titular</small>
-                                                    <div class="small fw-bold" id="card-holder-name">Nombre de Usuario</div>
-                                                </div>
-                                                <div class="text-end">
-                                                    <small class="opacity-50 text-uppercase" style="font-size: 0.65rem;">Vence</small>
-                                                    <div class="small fw-bold">12/29</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card border p-4 shadow-sm h-100" style="border-radius: 12px; border-style: dashed !important; background-color: #fafafa; cursor: pointer;">
-                                            <div class="d-flex flex-column align-items-center justify-content-center h-100 py-3">
-                                                <i class="bi bi-plus-circle display-6 text-muted mb-2"></i>
-                                                <h6 class="fw-bold text-muted mb-0">Agregar tarjeta bancaria</h6>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="row g-3" id="container-pagos">
+                                    <!-- Carga dinámica -->
                                 </div>
                             </div>
                             
@@ -194,6 +146,21 @@ export function renderPerfilUsuarioPage() {
                                     <div class="col text-center py-4 text-muted">Cargando tus publicaciones...</div>
                                 </div>
                             </div>
+
+                            <!-- 7. MIS PEDIDOS -->
+                            <div class="tab-pane fade" id="tab-pedidos" role="tabpanel">
+                                <h4 class="fw-bold mb-4 text-primary">Seguimiento de Pedidos</h4>
+                                <div id="container-pedidos" class="row row-cols-1 g-3">
+                                    <div class="col text-center py-4 text-muted">Cargando tus solicitudes de servicio...</div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
                             
                         </div>
                     </div>
@@ -321,6 +288,12 @@ export function initPerfilUsuarioPage() {
                 const me = await res.json();
                 userRole = me.role;
                 
+                // Inicializar direcciones y métodos de pago dinámicos
+                inicializarDireccionesYPagos(me);
+                
+                // Cargar órdenes y pedidos para seguimiento
+                cargarPedidos(me);
+
                 if (me.role === 'comun') {
                     // Cargar detalles completos del comun
                     const resComun = await fetch(`/api/usuarios-comunes/${me.id}`, {
@@ -330,6 +303,17 @@ export function initPerfilUsuarioPage() {
                     });
                     if (resComun.ok) {
                         userEntity = await resComun.json();
+                        
+                        // Sincronizar desde la BD a localStorage si existen datos
+                        if (userEntity.direccionesJson) {
+                            localStorage.setItem(keyAddresses, userEntity.direccionesJson);
+                        }
+                        if (userEntity.tarjetasJson) {
+                            localStorage.setItem(keyCards, userEntity.tarjetasJson);
+                        }
+                        renderDirecciones();
+                        renderPagos();
+                        
                         populateGeneralInfo(userEntity, 'comun');
                     }
                 } else if (me.role === 'trabajador') {
@@ -422,7 +406,10 @@ export function initPerfilUsuarioPage() {
                         nombre: updatedNombre,
                         email: userEntity.email,
                         telefono: updatedTelefono,
-                        contrasena: userEntity.contrasena // mantenemos contraseña
+                        contrasena: userEntity.contrasena, // mantenemos contraseña
+                        fotografiaPath: userEntity.fotografiaPath,
+                        direccionesJson: localStorage.getItem(keyAddresses),
+                        tarjetasJson: localStorage.getItem(keyCards)
                     };
 
                     const res = await fetch(`/api/usuarios-comunes/${userEntity.id}`, {
@@ -689,5 +676,547 @@ export function initPerfilUsuarioPage() {
                 reader.readAsDataURL(file);
             }
         });
+    }
+
+    // --- FUNCIONALIDADES DINÁMICAS (DIRECCIONES, MÉTODOS DE PAGO Y PEDIDOS) ---
+    const keyAddresses = `addresses_${userEmail}`;
+    const keyCards = `cards_${userEmail}`;
+
+    const sincronizarConBackend = async () => {
+        if (userRole !== 'comun' || !userEntity) return;
+
+        const currentAddresses = localStorage.getItem(keyAddresses) || '[]';
+        const currentCards = localStorage.getItem(keyCards) || '[]';
+
+        const payload = {
+            nombre: userEntity.nombre,
+            email: userEntity.email,
+            telefono: userEntity.telefono,
+            contrasena: userEntity.contrasena,
+            fotografiaPath: userEntity.fotografiaPath,
+            direccionesJson: currentAddresses,
+            tarjetasJson: currentCards
+        };
+
+        try {
+            const res = await fetch(`/api/usuarios-comunes/${userEntity.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const updatedUser = await res.json();
+                userEntity = updatedUser;
+                console.log("Datos de direcciones/tarjetas sincronizados en el backend.");
+            }
+        } catch (e) {
+            console.error("Error al sincronizar con el backend:", e);
+        }
+    };
+
+    function inicializarDireccionesYPagos(me) {
+        if (!localStorage.getItem(keyAddresses)) {
+            const defaultAddresses = [
+                { id: 1, alias: 'Domicilio Principal', direccion: 'Calle Paseo de la Reforma 115, Col. Centro, Delegación Cuauhtémoc, CDMX, C.P. 06000', esPrincipal: true }
+            ];
+            localStorage.setItem(keyAddresses, JSON.stringify(defaultAddresses));
+        }
+        if (!localStorage.getItem(keyCards)) {
+            const defaultCards = [
+                { id: 1, titular: me.nombre, numero: '4829', marca: 'Visa Classic', exp: '12/29' }
+            ];
+            localStorage.setItem(keyCards, JSON.stringify(defaultCards));
+        }
+        renderDirecciones();
+        renderPagos();
+    }
+
+    function renderDirecciones() {
+        const container = document.getElementById('container-direcciones');
+        if (!container) return;
+
+        const list = JSON.parse(localStorage.getItem(keyAddresses) || '[]');
+        container.innerHTML = '';
+
+        list.forEach(item => {
+            const col = document.createElement('div');
+            col.className = 'col-md-6';
+            col.innerHTML = `
+                <div class="card border p-3 shadow-sm h-100 position-relative" style="border-radius: 8px;">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge ${item.esPrincipal ? 'bg-primary' : 'bg-secondary'}">${item.esPrincipal ? 'Principal' : 'Secundaria'}</span>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-link text-primary p-0 btn-edit-dir" data-id="${item.id}" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-link text-danger p-0 btn-del-dir" data-id="${item.id}" title="Eliminar"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                    <h6 class="fw-bold mb-1">${item.alias}</h6>
+                    <p class="text-muted small mb-0">${item.direccion}</p>
+                </div>
+            `;
+            container.appendChild(col);
+        });
+
+        const addCol = document.createElement('div');
+        addCol.className = 'col-md-6';
+        addCol.innerHTML = `
+            <div class="card border p-3 shadow-sm h-100" id="btn-add-direccion" style="border-radius: 8px; border-style: dashed !important; background-color: #fafafa; cursor: pointer; min-height: 120px;">
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 py-3">
+                    <i class="bi bi-plus-circle display-6 text-muted mb-2"></i>
+                    <h6 class="fw-bold text-muted mb-0">Agregar nueva dirección</h6>
+                </div>
+            </div>
+        `;
+        container.appendChild(addCol);
+
+        const btnAdd = document.getElementById('btn-add-direccion');
+        if (btnAdd) {
+            btnAdd.addEventListener('click', async () => {
+                const { value: formValues } = await Swal.fire({
+                    title: 'Agregar Nueva Dirección',
+                    html:
+                        '<input id="swal-alias" class="swal2-input" placeholder="Nombre (Ej. Trabajo, Casa)">' +
+                        '<input id="swal-direccion" class="swal2-input" placeholder="Dirección Completa">',
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: () => {
+                        const alias = document.getElementById('swal-alias').value.trim();
+                        const direccion = document.getElementById('swal-direccion').value.trim();
+                        if (!alias || !direccion) {
+                            Swal.showValidationMessage('Todos los campos son obligatorios');
+                        }
+                        return { alias, direccion };
+                    }
+                });
+
+                if (formValues) {
+                    const addresses = JSON.parse(localStorage.getItem(keyAddresses) || '[]');
+                    const newId = addresses.length > 0 ? Math.max(...addresses.map(a => a.id)) + 1 : 1;
+                    addresses.push({
+                        id: newId,
+                        alias: formValues.alias,
+                        direccion: formValues.direccion,
+                        esPrincipal: addresses.length === 0
+                    });
+                    localStorage.setItem(keyAddresses, JSON.stringify(addresses));
+                    renderDirecciones();
+                    await sincronizarConBackend();
+                    Swal.fire('¡Guardado!', 'La dirección ha sido agregada.', 'success');
+                }
+            });
+        }
+
+        container.querySelectorAll('.btn-edit-dir').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                const addresses = JSON.parse(localStorage.getItem(keyAddresses) || '[]');
+                const item = addresses.find(a => a.id === id);
+                if (!item) return;
+
+                const { value: formValues } = await Swal.fire({
+                    title: 'Editar Dirección',
+                    html:
+                        `<input id="swal-alias" class="swal2-input" placeholder="Nombre" value="${item.alias}">` +
+                        `<input id="swal-direccion" class="swal2-input" placeholder="Dirección" value="${item.direccion}">`,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: () => {
+                        const alias = document.getElementById('swal-alias').value.trim();
+                        const direccion = document.getElementById('swal-direccion').value.trim();
+                        if (!alias || !direccion) {
+                            Swal.showValidationMessage('Todos los campos son obligatorios');
+                        }
+                        return { alias, direccion };
+                    }
+                });
+
+                if (formValues) {
+                    item.alias = formValues.alias;
+                    item.direccion = formValues.direccion;
+                    localStorage.setItem(keyAddresses, JSON.stringify(addresses));
+                    renderDirecciones();
+                    await sincronizarConBackend();
+                    Swal.fire('¡Actualizado!', 'La dirección ha sido modificada.', 'success');
+                }
+            });
+        });
+
+        container.querySelectorAll('.btn-del-dir').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "No podrás deshacer esta acción",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        let addresses = JSON.parse(localStorage.getItem(keyAddresses) || '[]');
+                        const wasPrincipal = addresses.find(a => a.id === id)?.esPrincipal;
+                        addresses = addresses.filter(a => a.id !== id);
+                        if (wasPrincipal && addresses.length > 0) {
+                            addresses[0].esPrincipal = true;
+                        }
+                        localStorage.setItem(keyAddresses, JSON.stringify(addresses));
+                        renderDirecciones();
+                        await sincronizarConBackend();
+                        Swal.fire('¡Eliminado!', 'La dirección ha sido eliminada.', 'success');
+                    }
+                });
+            });
+        });
+    }
+
+    function renderPagos() {
+        const container = document.getElementById('container-pagos');
+        if (!container) return;
+
+        const list = JSON.parse(localStorage.getItem(keyCards) || '[]');
+        container.innerHTML = '';
+
+        list.forEach(card => {
+            const col = document.createElement('div');
+            col.className = 'col-md-6';
+            col.innerHTML = `
+                <div class="p-4 text-white shadow-sm position-relative" style="border-radius: 12px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); height: 180px;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="opacity-75">FYNDR Card</small>
+                            <h5 class="fw-bold mb-0 mt-1">${card.marca}</h5>
+                        </div>
+                        <button class="btn btn-link text-white p-0 btn-del-card" data-id="${card.id}" title="Eliminar tarjeta" style="z-index: 10;"><i class="bi bi-trash-fill"></i></button>
+                    </div>
+                    <div class="my-3 text-center">
+                        <span class="fs-5 tracking-wide">••••  ••••  ••••  ${card.numero}</span>
+                    </div>
+                    <div class="position-absolute bottom-0 start-0 p-4 w-100 d-flex justify-content-between">
+                        <div>
+                            <small class="opacity-50 text-uppercase" style="font-size: 0.65rem;">Titular</small>
+                            <div class="small fw-bold">${card.titular}</div>
+                        </div>
+                        <div class="text-end">
+                            <small class="opacity-50 text-uppercase" style="font-size: 0.65rem;">Vence</small>
+                            <div class="small fw-bold">${card.exp}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(col);
+        });
+
+        const addCol = document.createElement('div');
+        addCol.className = 'col-md-6';
+        addCol.innerHTML = `
+            <div class="card border p-4 shadow-sm h-100" id="btn-add-card" style="border-radius: 12px; border-style: dashed !important; background-color: #fafafa; cursor: pointer; min-height: 180px;">
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 py-3">
+                    <i class="bi bi-plus-circle display-6 text-muted mb-2"></i>
+                    <h6 class="fw-bold text-muted mb-0">Agregar tarjeta bancaria</h6>
+                </div>
+            </div>
+        `;
+        container.appendChild(addCol);
+
+        const btnAddCard = document.getElementById('btn-add-card');
+        if (btnAddCard) {
+            btnAddCard.addEventListener('click', async () => {
+                const { value: formValues } = await Swal.fire({
+                    title: 'Agregar Tarjeta Bancaria',
+                    html:
+                        '<input id="swal-titular" class="swal2-input" placeholder="Nombre del Titular" value="' + currentUser.nombre + '">' +
+                        '<input id="swal-numero" class="swal2-input" maxlength="16" placeholder="Número de Tarjeta (16 dígitos)">' +
+                        '<div class="d-flex gap-2 justify-content-center px-4 mt-2">' +
+                        '  <input id="swal-exp" class="swal2-input w-50 m-0" placeholder="MM/AA (Vencimiento)">' +
+                        '  <input id="swal-cvv" class="swal2-input w-50 m-0" type="password" maxlength="3" placeholder="CVV">' +
+                        '</div>',
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: () => {
+                        const titular = document.getElementById('swal-titular').value.trim();
+                        const numero = document.getElementById('swal-numero').value.trim();
+                        const exp = document.getElementById('swal-exp').value.trim();
+                        const cvv = document.getElementById('swal-cvv').value.trim();
+                        if (!titular || !numero || !exp || !cvv) {
+                            Swal.showValidationMessage('Todos los campos son obligatorios');
+                        }
+                        if (numero.length < 16) {
+                            Swal.showValidationMessage('El número de tarjeta debe tener 16 dígitos');
+                        }
+                        return { titular, numero: numero.slice(-4), exp };
+                    }
+                });
+
+                if (formValues) {
+                    const cards = JSON.parse(localStorage.getItem(keyCards) || '[]');
+                    const newId = cards.length > 0 ? Math.max(...cards.map(c => c.id)) + 1 : 1;
+                    cards.push({
+                        id: newId,
+                        titular: formValues.titular,
+                        numero: formValues.numero,
+                        marca: 'Visa Classic',
+                        exp: formValues.exp
+                    });
+                    localStorage.setItem(keyCards, JSON.stringify(cards));
+                    renderPagos();
+                    await sincronizarConBackend();
+                    Swal.fire('¡Guardado!', 'La tarjeta ha sido registrada.', 'success');
+                }
+            });
+        }
+
+        container.querySelectorAll('.btn-del-card').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.getAttribute('data-id'));
+                Swal.fire({
+                    title: '¿Eliminar tarjeta?',
+                    text: "Esta tarjeta dejará de estar disponible para tus pagos",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        let cards = JSON.parse(localStorage.getItem(keyCards) || '[]');
+                        cards = cards.filter(c => c.id !== id);
+                        localStorage.setItem(keyCards, JSON.stringify(cards));
+                        renderPagos();
+                        await sincronizarConBackend();
+                        Swal.fire('¡Eliminada!', 'El método de pago ha sido removido.', 'success');
+                    }
+                });
+            });
+        });
+    }
+
+    async function cargarPedidos(me) {
+        const container = document.getElementById('container-pedidos');
+        if (!container) return;
+
+        container.innerHTML = '<div class="col text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Cargando pedidos...</div>';
+
+        try {
+            let hiredOrders = [];
+            let receivedOrders = [];
+
+            const resComun = await fetch(`/api/contrataciones/usuario/${me.id}`);
+            if (resComun.ok) {
+                hiredOrders = await resComun.json();
+            }
+
+            if (me.role === 'trabajador') {
+                const resTrab = await fetch(`/api/contrataciones/trabajador/${me.id}`);
+                if (resTrab.ok) {
+                    receivedOrders = await resTrab.json();
+                }
+            }
+
+            container.innerHTML = '';
+
+            if (hiredOrders.length === 0 && receivedOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="col text-center py-5 text-muted border rounded" style="border-style: dashed !important; background-color: #fafafa;">
+                        <i class="bi bi-clock-history display-4 mb-2 d-block text-secondary"></i>
+                        <h6 class="fw-bold">No tienes solicitudes activas</h6>
+                        <p class="small mb-0">Contrata un servicio desde la página de búsqueda para darle seguimiento aquí.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (hiredOrders.length > 0) {
+                const title = document.createElement('h5');
+                title.className = 'fw-bold mb-3 mt-2 text-secondary';
+                title.innerHTML = `<i class="bi bi-person-fill-check me-2"></i>Servicios que contrataste`;
+                container.appendChild(title);
+
+                hiredOrders.forEach(order => {
+                    const card = document.createElement('div');
+                    card.className = 'card border shadow-sm mb-3 p-3';
+                    card.style.borderRadius = '10px';
+                    
+                    let badgeColor = 'bg-warning text-dark';
+                    if (order.estado === 'Aceptada') badgeColor = 'bg-primary text-white';
+                    if (order.estado === 'Completada') badgeColor = 'bg-success text-white';
+                    if (order.estado === 'Cancelada') badgeColor = 'bg-danger text-white';
+
+                    const fecha = new Date(order.fechaContratacion).toLocaleDateString('es-MX', {
+                        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    card.innerHTML = `
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="fw-bold text-dark mb-1">Trabajador: ${order.nombreUsuarioTrabajador}</h6>
+                                <p class="text-muted small mb-1"><i class="bi bi-calendar-event me-1"></i>Fecha: ${fecha}</p>
+                                <p class="text-muted small mb-0"><i class="bi bi-hash me-1"></i>ID de Pedido: ${order.id}</p>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                                <span class="badge ${badgeColor} px-3 py-2 mb-2 d-inline-block" style="font-size: 0.85rem;">${order.estado}</span>
+                                <div class="d-flex gap-2 justify-content-md-end">
+                                    <button class="btn btn-sm btn-outline-primary px-3 py-1 btn-chat-order" data-id="${order.idUsuarioTrabajador}" data-name="${order.nombreUsuarioTrabajador}" style="font-size: 0.8rem;">
+                                        <i class="bi bi-chat-fill me-1"></i>Chat
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            if (receivedOrders.length > 0) {
+                const title = document.createElement('h5');
+                title.className = 'fw-bold mb-3 mt-4 text-secondary';
+                title.innerHTML = `<i class="bi bi-briefcase-fill me-2"></i>Pedidos de clientes recibidos`;
+                container.appendChild(title);
+
+                receivedOrders.forEach(order => {
+                    const card = document.createElement('div');
+                    card.className = 'card border shadow-sm mb-3 p-3';
+                    card.style.borderRadius = '10px';
+                    
+                    let badgeColor = 'bg-warning text-dark';
+                    if (order.estado === 'Aceptada') badgeColor = 'bg-primary text-white';
+                    if (order.estado === 'Completada') badgeColor = 'bg-success text-white';
+                    if (order.estado === 'Cancelada') badgeColor = 'bg-danger text-white';
+
+                    const fecha = new Date(order.fechaContratacion).toLocaleDateString('es-MX', {
+                        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    let actionButtons = '';
+                    if (order.estado === 'Pendiente') {
+                        actionButtons = `
+                            <button class="btn btn-sm btn-success px-3 py-1 btn-accept-order" data-id="${order.id}" data-comun="${order.idUsuarioComun}" data-fecha="${order.fechaContratacion}" style="font-size: 0.8rem;">
+                                Aceptar
+                            </button>
+                        `;
+                    } else if (order.estado === 'Aceptada') {
+                        actionButtons = `
+                            <button class="btn btn-sm btn-primary px-3 py-1 btn-complete-order" data-id="${order.id}" data-comun="${order.idUsuarioComun}" data-fecha="${order.fechaContratacion}" style="font-size: 0.8rem;">
+                                Completar
+                            </button>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="fw-bold text-dark mb-1">Cliente: ${order.nombreUsuarioComun}</h6>
+                                <p class="text-muted small mb-1"><i class="bi bi-calendar-event me-1"></i>Fecha: ${fecha}</p>
+                                <p class="text-muted small mb-0"><i class="bi bi-hash me-1"></i>ID de Pedido: ${order.id}</p>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                                <span class="badge ${badgeColor} px-3 py-2 mb-2 d-inline-block" style="font-size: 0.85rem;">${order.estado}</span>
+                                <div class="d-flex gap-2 justify-content-md-end">
+                                    ${actionButtons}
+                                    <button class="btn btn-sm btn-outline-primary px-3 py-1 btn-chat-order-worker" data-id="${order.idUsuarioComun}" data-name="${order.nombreUsuarioComun}" style="font-size: 0.8rem;">
+                                        <i class="bi bi-chat-fill me-1"></i>Chat
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            container.querySelectorAll('.btn-chat-order').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idDestinatario = btn.getAttribute('data-id');
+                    window.location.hash = `#chat/${idDestinatario}`;
+                });
+            });
+
+            container.querySelectorAll('.btn-chat-order-worker').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idDestinatario = btn.getAttribute('data-id');
+                    window.location.hash = `#chat/${idDestinatario}`;
+                });
+            });
+
+            container.querySelectorAll('.btn-accept-order').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const orderId = btn.getAttribute('data-id');
+                    const comunId = btn.getAttribute('data-comun');
+                    const fecha = btn.getAttribute('data-fecha');
+                    try {
+                        const token = localStorage.getItem('token');
+                        const res = await fetch(`/api/contrataciones/${orderId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                idUsuarioComun: parseInt(comunId),
+                                idUsuarioTrabajador: me.id,
+                                fechaContratacion: fecha,
+                                estado: 'Aceptada'
+                            })
+                        });
+                        if (res.ok) {
+                            Swal.fire('¡Pedido Aceptado!', 'Has aceptado la solicitud de servicio.', 'success');
+                            cargarPedidos(me);
+                        } else {
+                            Swal.fire('Error', 'No se pudo actualizar el estado del pedido.', 'error');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+            });
+
+            container.querySelectorAll('.btn-complete-order').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const orderId = btn.getAttribute('data-id');
+                    const comunId = btn.getAttribute('data-comun');
+                    const fecha = btn.getAttribute('data-fecha');
+                    try {
+                        const token = localStorage.getItem('token');
+                        const res = await fetch(`/api/contrataciones/${orderId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                idUsuarioComun: parseInt(comunId),
+                                idUsuarioTrabajador: me.id,
+                                fechaContratacion: fecha,
+                                estado: 'Completada'
+                            })
+                        });
+                        if (res.ok) {
+                            Swal.fire('¡Servicio Completado!', 'Has marcado el servicio como completado.', 'success');
+                            cargarPedidos(me);
+                        } else {
+                            Swal.fire('Error', 'No se pudo actualizar el estado del pedido.', 'error');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+            });
+
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = '<div class="col text-center py-4 text-danger">Error al obtener las contrataciones.</div>';
+        }
     }
 }

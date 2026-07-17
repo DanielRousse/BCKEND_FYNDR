@@ -52,7 +52,7 @@ public class UsuarioComunService {
         return null;
     } // deleteEntidad
 
-    public UsuarioComun actualizarEntidad(Long id, String nombre, String email, String telefono, String contrasena, String fotografiaPath) {
+    public UsuarioComun actualizarEntidad(Long id, String nombre, String email, String telefono, String contrasena, String fotografiaPath, String direccionesJson, String tarjetasJson) {
         UsuarioComun u = getEntidad(id);
         if (u != null) {
             if (nombre != null) {
@@ -69,6 +69,12 @@ public class UsuarioComunService {
             } // if
             if (fotografiaPath != null) {
                 u.setFotografiaPath(fotografiaPath);
+            } // if
+            if (direccionesJson != null) {
+                u.setDireccionesJson(direccionesJson);
+            } // if
+            if (tarjetasJson != null) {
+                u.setTarjetasJson(tarjetasJson);
             } // if
             UsuarioComun updated = repository.save(u);
             logger.info("Usuario común actualizado: id={}", updated.getId());

@@ -44,7 +44,7 @@ public class UsuarioComunController {
     @PutMapping(path="{entidadId}")
     public UsuarioComun actualizarUsuario(@PathVariable("entidadId") Long id, @Valid @RequestBody UsuarioComunDTO dto) {
         // PUT http://localhost:8080/api/usuarios-comunes/1
-        return service.actualizarEntidad(id, dto.getNombre(), dto.getEmail(), dto.getTelefono(), dto.getContrasena(), dto.getFotografiaPath());
+        return service.actualizarEntidad(id, dto.getNombre(), dto.getEmail(), dto.getTelefono(), dto.getContrasena(), dto.getFotografiaPath(), dto.getDireccionesJson(), dto.getTarjetasJson());
     } // actualizarUsuario
 
     @DeleteMapping(path="{entidadId}")

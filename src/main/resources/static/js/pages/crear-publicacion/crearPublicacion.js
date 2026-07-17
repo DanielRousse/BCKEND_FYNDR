@@ -266,13 +266,12 @@ export function initCrearPublicacionPage() {
                 console.error("Error al buscar ID de trabajador:", err);
             }
 
-            // Construir payload que espera el backend
             const publicacionBackend = {
                 titulo: info.tituloServicio || "Servicio",
                 descripcion: info.descripcionServicio || "",
                 precio: parseFloat(info.precioEstimado) || 0.0,
                 idUsuarioTrabajador: idTrabajador,
-                imagenPath: evidencias.length > 0 ? evidencias[0].contenidoBase64 : ""
+                imagenPath: payload.evidencias.length > 0 ? payload.evidencias[0].contenidoBase64 : ""
             };
 
             // Enviar al backend mediante fetch

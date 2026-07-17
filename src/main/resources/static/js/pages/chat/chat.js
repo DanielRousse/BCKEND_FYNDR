@@ -55,12 +55,12 @@ export function initChatPage(id) {
 
     let userId = null;
     let userRole = 'comun'; // o 'trabajador'
-    let workerId = parseInt(id);
+    let otherId = parseInt(id);
 
     // 1. Obtener información del profesional
-    const fetchWorkerInfo = async () => {
+    const fetchWorkerInfo = async (wId) => {
         try {
-            const res = await fetch(`/api/usuarios-trabajadores/${workerId}`);
+            const res = await fetch(`/api/usuarios-trabajadores/${wId}`);
             if (res.ok) {
                 const match = await res.json();
                 document.getElementById('chat-nombre').textContent = match.nombre;
@@ -70,7 +70,20 @@ export function initChatPage(id) {
             console.error(err);
         }
     };
-    fetchWorkerInfo();
+
+    // Obtener información del cliente
+    const fetchClientInfo = async (cId) => {
+        try {
+            const res = await fetch(`/api/usuarios-comunes/${cId}`);
+            if (res.ok) {
+                const match = await res.json();
+                document.getElementById('chat-nombre').textContent = match.nombre;
+                document.getElementById('chat-servicio').textContent = 'Cliente de Fyndr';
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     // 2. Obtener el ID y Rol del usuario común/trabajador logueado
     const fetchUserSession = async () => {
@@ -84,6 +97,17 @@ export function initChatPage(id) {
                 const me = await res.json();
                 userId = me.id;
                 userRole = me.role;
+
+                if (userRole === 'comun') {
+                    fetchWorkerInfo(otherId);
+                } else {
+                    fetchClientInfo(otherId);
+                }
+
+                // Iniciar la carga de mensajes y polling
+                loadMessages();
+                if (chatInterval) clearInterval(chatInterval);
+                chatInterval = setInterval(loadMessages, 3000);
             }
         } catch (err) {
             console.error('Error al resolver sesión de chat:', err);
@@ -95,8 +119,8 @@ export function initChatPage(id) {
         if (!userId) return;
         
         try {
-            const comunId = userRole === 'comun' ? userId : workerId;
-            const trabId = userRole === 'trabajador' ? userId : workerId;
+            const comunId = userRole === 'comun' ? userId : otherId;
+            const trabId = userRole === 'trabajador' ? userId : otherId;
             
             const response = await fetch(`/api/mensajes/conversacion?idUsuarioComun=${comunId}&idUsuarioTrabajador=${trabId}`, {
                 headers: {
@@ -136,7 +160,6 @@ export function initChatPage(id) {
                     container.appendChild(bubbleWrapper);
                 });
                 
-                // Hacer scroll al final del chat automáticamente
                 container.scrollTop = container.scrollHeight;
             }
         } catch (err) {
@@ -144,13 +167,7 @@ export function initChatPage(id) {
         }
     };
 
-    // Inicializar sesión y arrancar polling
-    fetchUserSession().then(() => {
-        loadMessages();
-        // Polling cada 3 segundos
-        if (chatInterval) clearInterval(chatInterval);
-        chatInterval = setInterval(loadMessages, 3000);
-    });
+    fetchUserSession();
 
     // 4. Enviar un nuevo mensaje
     const form = document.getElementById('chat-form');
@@ -166,8 +183,8 @@ export function initChatPage(id) {
                 const pad = (num) => String(num).padStart(2, '0');
                 const localIsoString = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
                 
-                const comunId = userRole === 'comun' ? userId : workerId;
-                const trabId = userRole === 'trabajador' ? userId : workerId;
+                const comunId = userRole === 'comun' ? userId : otherId;
+                const trabId = userRole === 'trabajador' ? userId : otherId;
 
                 const payload = {
                     idUsuarioComun: comunId,
@@ -188,7 +205,7 @@ export function initChatPage(id) {
 
                 if (res.ok) {
                     input.value = '';
-                    loadMessages(); // Cargar al instante
+                    loadMessages();
                 }
             } catch (err) {
                 console.error('Error al enviar mensaje:', err);
@@ -201,7 +218,11 @@ export function initChatPage(id) {
     if (btnBack) {
         btnBack.addEventListener('click', () => {
             if (chatInterval) clearInterval(chatInterval);
-            window.location.hash = `#perfil-profesional/${id}`;
+            if (userRole === 'comun') {
+                window.location.hash = `#perfil-profesional/${id}`;
+            } else {
+                window.location.hash = `#mi-perfil`;
+            }
         });
     }
     

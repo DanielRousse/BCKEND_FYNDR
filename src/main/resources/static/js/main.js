@@ -12,6 +12,8 @@ import { renderPerfilProfesionalPage, initPerfilProfesionalPage } from './pages/
 import { renderHacerPedidoPage, initHacerPedidoPage } from './pages/hacer-pedido/hacerPedido.js';
 import { renderChatPage, initChatPage } from './pages/chat/chat.js';
 import { renderPerfilUsuarioPage, initPerfilUsuarioPage } from './pages/mi-perfil/miPerfil.js';
+import { renderPdfPage, initPdfPage } from './pages/ver-pdf/verPdf.js';
+import { renderFaqPage, initFaqPage } from './pages/faq/preguntasFrecuentes.js';
 
 const mainContent = document.getElementById('main-content');
 
@@ -29,7 +31,9 @@ const routes = {
     '#perfil-profesional': { render: renderPerfilProfesionalPage, init: initPerfilProfesionalPage },
     '#hacer-pedido': { render: renderHacerPedidoPage, init: initHacerPedidoPage },
     '#chat': { render: renderChatPage, init: initChatPage },
-    '#mi-perfil': { render: renderPerfilUsuarioPage, init: initPerfilUsuarioPage }
+    '#mi-perfil': { render: renderPerfilUsuarioPage, init: initPerfilUsuarioPage },
+    '#ver-pdf': { render: renderPdfPage, init: initPdfPage },
+    '#faq': { render: renderFaqPage, init: initFaqPage }
 };
 
 function updateAuthUI() {

@@ -21,16 +21,20 @@ public class UsuarioComunDTO {
 
     private String contrasena;
     private String fotografiaPath;
+    private String direccionesJson;
+    private String tarjetasJson;
 
     public UsuarioComunDTO() {
     } // UsuarioComunDTO
 
-    public UsuarioComunDTO(String nombre, String email, String telefono, String contrasena, String fotografiaPath) {
+    public UsuarioComunDTO(String nombre, String email, String telefono, String contrasena, String fotografiaPath, String direccionesJson, String tarjetasJson) {
         this.nombre = nombre;
         this.email = email;
         this.telefono = telefono;
         this.contrasena = contrasena;
         this.fotografiaPath = fotografiaPath;
+        this.direccionesJson = direccionesJson;
+        this.tarjetasJson = tarjetasJson;
     } // UsuarioComunDTO
 
     public String getNombre() {
@@ -72,6 +76,22 @@ public class UsuarioComunDTO {
     public void setFotografiaPath(String fotografiaPath) {
         this.fotografiaPath = fotografiaPath;
     } // setFotografiaPath
+
+    public String getDireccionesJson() {
+        return direccionesJson;
+    }
+
+    public void setDireccionesJson(String direccionesJson) {
+        this.direccionesJson = direccionesJson;
+    }
+
+    public String getTarjetasJson() {
+        return tarjetasJson;
+    }
+
+    public void setTarjetasJson(String tarjetasJson) {
+        this.tarjetasJson = tarjetasJson;
+    }
 
     @Override
     public String toString() {
