@@ -98,10 +98,24 @@ export function initPerfilProfesionalPage(id) {
             filtered.forEach(pub => {
                 const card = document.createElement('div');
                 card.className = 'col';
+                
+                let imgHtml = '';
+                if (pub.imagenPath) {
+                    imgHtml = `<img src="${pub.imagenPath}" class="card-img-top border-bottom mb-2" style="height: 140px; object-fit: cover; border-radius: 4px;" alt="Servicio">`;
+                } else {
+                    const cleanTitle = (pub.titulo || "").toLowerCase();
+                    let defaultImg = './assets/carpintero.jpg';
+                    if (cleanTitle.includes('plom') || cleanTitle.includes('tub') || cleanTitle.includes('fuga') || cleanTitle.includes('agua') || cleanTitle.includes('calentador')) {
+                        defaultImg = './assets/plomero.jpg';
+                    }
+                    imgHtml = `<img src="${defaultImg}" class="card-img-top border-bottom mb-2" style="height: 140px; object-fit: cover; border-radius: 4px;" alt="Servicio">`;
+                }
+
                 card.innerHTML = `
                     <div class="card h-100 border p-3 shadow-sm" style="border-radius: 8px; background-color: #fafafa;">
-                        <h6 class="fw-bold mb-1">${pub.titulo}</h6>
-                        <p class="text-muted small mb-2">${pub.descripcion}</p>
+                        ${imgHtml}
+                        <h6 class="fw-bold mb-1 mt-1">${pub.titulo}</h6>
+                        <p class="text-muted small mb-2" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 3.6em;">${pub.descripcion}</p>
                         <div class="fw-bold text-primary">$${pub.precio} MXN</div>
                     </div>
                 `;

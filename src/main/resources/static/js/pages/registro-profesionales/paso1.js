@@ -1,5 +1,8 @@
 export function renderPaso1() {
 
+    const token = localStorage.getItem('token');
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const emailReadOnly = (token && currentUser && currentUser.role === 'comun') ? 'readonly disabled' : '';
     const datos = window.registroProfesionalState?.datos || {};
 
     return `
@@ -28,7 +31,8 @@ export function renderPaso1() {
                     class="form-control"
                     id="correo"
                     placeholder="correo@ejemplo.com"
-                    value="${datos.correo}">
+                    value="${datos.correo}"
+                    ${emailReadOnly}>
                 <small id="error-correo" class="text-danger"></small>
             </div>
 

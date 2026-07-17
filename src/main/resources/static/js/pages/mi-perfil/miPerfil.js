@@ -23,6 +23,7 @@ export function renderPerfilUsuarioPage() {
                             <button class="nav-link text-start py-2 px-3 mb-1" id="tab-pagos-btn" data-bs-toggle="pill" data-bs-target="#tab-pagos" type="button" role="tab"><i class="bi bi-credit-card me-2"></i>Métodos de Pago</button>
                             <button class="nav-link text-start py-2 px-3 mb-1" id="tab-seguridad-btn" data-bs-toggle="pill" data-bs-target="#tab-seguridad" type="button" role="tab"><i class="bi bi-shield-lock me-2"></i>Seguridad</button>
                             <button class="nav-link text-start py-2 px-3 mb-1 d-none" id="tab-profesional-btn" data-bs-toggle="pill" data-bs-target="#tab-profesional" type="button" role="tab"><i class="bi bi-briefcase me-2"></i>Panel Profesional</button>
+                            <button class="nav-link text-start py-2 px-3 mb-1 d-none" id="tab-publicaciones-btn" data-bs-toggle="pill" data-bs-target="#tab-publicaciones" type="button" role="tab"><i class="bi bi-card-list me-2"></i>Mis Publicaciones</button>
                         </div>
                     </div>
                 </div>
@@ -182,6 +183,17 @@ export function renderPerfilUsuarioPage() {
                                     <button type="submit" class="btn btn-primary btn-custom mt-4 px-4 py-2" style="border-radius: 8px;">Guardar Configuración</button>
                                 </form>
                             </div>
+
+                            <!-- 6. MIS PUBLICACIONES (Únicamente para Trabajadores) -->
+                            <div class="tab-pane fade" id="tab-publicaciones" role="tabpanel">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h4 class="fw-bold mb-0 text-primary">Mis Publicaciones de Servicios</h4>
+                                    <a href="#crear-publicacion" class="btn btn-sm btn-primary px-3" style="border-radius: 8px;"><i class="bi bi-plus-circle me-1"></i>Crear Publicación</a>
+                                </div>
+                                <div id="panel-publicaciones-list" class="row row-cols-1 g-3">
+                                    <div class="col text-center py-4 text-muted">Cargando tus publicaciones...</div>
+                                </div>
+                            </div>
                             
                         </div>
                     </div>
@@ -203,6 +215,99 @@ export function initPerfilUsuarioPage() {
 
     let userEntity = null;
     let userRole = 'comun'; // o 'trabajador'
+
+    const cargarMisPublicaciones = async (trabajadorId) => {
+        try {
+            const res = await fetch(`/api/publicaciones/trabajador/${trabajadorId}`);
+            const listContainer = document.getElementById('panel-publicaciones-list');
+            if (!listContainer) return;
+            
+            listContainer.innerHTML = '';
+            
+            if (!res.ok) {
+                listContainer.innerHTML = `<div class="col text-center py-4 text-danger">No se pudieron cargar tus publicaciones.</div>`;
+                return;
+            }
+            
+            const pubs = await res.json();
+            if (pubs.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="col text-center py-5 text-muted border rounded" style="border-style: dashed !important; background-color: #fafafa;">
+                        <i class="bi bi-card-list display-4 mb-2 d-block text-secondary"></i>
+                        <h6 class="fw-bold">Aún no tienes publicaciones</h6>
+                        <p class="small mb-3">Publica tus servicios para que las personas te puedan contratar.</p>
+                        <a href="#crear-publicacion" class="btn btn-sm btn-primary px-3" style="border-radius: 8px;">Crear mi primera publicación</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            pubs.forEach(pub => {
+                const item = document.createElement('div');
+                item.className = 'col';
+                
+                let imgHtml = '';
+                if (pub.imagenPath) {
+                    imgHtml = `<img src="${pub.imagenPath}" class="rounded border me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Evidencia">`;
+                } else {
+                    const cleanTitle = (pub.titulo || "").toLowerCase();
+                    let defaultImg = './assets/carpintero.jpg';
+                    if (cleanTitle.includes('plom') || cleanTitle.includes('tub') || cleanTitle.includes('fuga') || cleanTitle.includes('agua') || cleanTitle.includes('calentador')) {
+                        defaultImg = './assets/plomero.jpg';
+                    }
+                    imgHtml = `<img src="${defaultImg}" class="rounded border me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Evidencia">`;
+                }
+                
+                item.innerHTML = `
+                    <div class="card border p-3 shadow-sm" style="border-radius: 10px; background-color: #fcfdfe;">
+                        <div class="d-flex align-items-center">
+                            ${imgHtml}
+                            <div class="flex-grow-1 min-w-0">
+                                <h6 class="fw-bold mb-1 text-truncate">${pub.titulo}</h6>
+                                <p class="text-muted small mb-1 text-truncate-2" style="max-height: 2.8em; overflow: hidden;">${pub.descripcion}</p>
+                                <span class="fw-bold text-primary">$${pub.precio} MXN</span>
+                            </div>
+                            <div class="ms-3">
+                                <button class="btn btn-sm btn-outline-danger btn-eliminar-pub" data-pub-id="${pub.id}">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+            
+            // Agregar listeners de eliminación
+            listContainer.querySelectorAll('.btn-eliminar-pub').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const pubId = btn.getAttribute('data-pub-id');
+                    if (window.confirm('¿Estás seguro de que deseas eliminar esta publicación?')) {
+                        try {
+                            const delRes = await fetch(`/api/publicaciones/${pubId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`
+                                }
+                            });
+                            if (delRes.ok) {
+                                window.alert('Publicación eliminada con éxito.');
+                                cargarMisPublicaciones(trabajadorId);
+                            } else {
+                                window.alert('No se pudo eliminar la publicación.');
+                            }
+                        } catch (err) {
+                            console.error('Error al eliminar publicación:', err);
+                            window.alert('Error de red al intentar eliminar la publicación.');
+                        }
+                    }
+                });
+            });
+            
+        } catch (err) {
+            console.error('Error al cargar publicaciones en el panel:', err);
+        }
+    };
 
     // 1. Cargar la sesión desde el backend e identificar rol
     const loadSessionData = async () => {
@@ -243,6 +348,11 @@ export function initPerfilUsuarioPage() {
                     // Mostrar la pestaña de configuración del profesional
                     const profBtn = document.getElementById('tab-profesional-btn');
                     if (profBtn) profBtn.classList.remove('d-none');
+
+                    const pubsBtn = document.getElementById('tab-publicaciones-btn');
+                    if (pubsBtn) pubsBtn.classList.remove('d-none');
+                    
+                    cargarMisPublicaciones(me.id);
                 }
             } else {
                 window.alert("Sesión expirada.");

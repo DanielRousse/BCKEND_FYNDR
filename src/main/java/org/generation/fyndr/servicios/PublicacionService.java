@@ -52,6 +52,7 @@ public class PublicacionService {
         p.setPrecio(dto.getPrecio());
         p.setFechaPublicacion(dto.getFechaPublicacion() != null ? dto.getFechaPublicacion() : LocalDateTime.now());
         p.setUsuarioTrabajador(ut);
+        p.setImagenPath(dto.getImagenPath());
 
         Publicacion saved = publicacionRepository.save(p);
         return convertToResponseDTO(saved);
@@ -78,6 +79,7 @@ public class PublicacionService {
                 p.setUsuarioTrabajador(ut);
             }
             if (dto.getFechaPublicacion() != null) p.setFechaPublicacion(dto.getFechaPublicacion());
+            if (dto.getImagenPath() != null) p.setImagenPath(dto.getImagenPath());
             
             Publicacion updated = publicacionRepository.save(p);
             return convertToResponseDTO(updated);
@@ -99,7 +101,8 @@ public class PublicacionService {
                 p.getPrecio(),
                 p.getFechaPublicacion(),
                 p.getUsuarioTrabajador().getId(),
-                p.getUsuarioTrabajador().getNombre()
+                p.getUsuarioTrabajador().getNombre(),
+                p.getImagenPath()
         );
     }
 }

@@ -11,10 +11,11 @@ public class PublicacionResponseDTO {
     private LocalDateTime fechaPublicacion;
     private Long idUsuarioTrabajador;
     private String nombreUsuarioTrabajador;
+    private String imagenPath;
 
     public PublicacionResponseDTO() {}
 
-    public PublicacionResponseDTO(Long id, String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, Long idUsuarioTrabajador, String nombreUsuarioTrabajador) {
+    public PublicacionResponseDTO(Long id, String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, Long idUsuarioTrabajador, String nombreUsuarioTrabajador, String imagenPath) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -22,6 +23,7 @@ public class PublicacionResponseDTO {
         this.fechaPublicacion = fechaPublicacion;
         this.idUsuarioTrabajador = idUsuarioTrabajador;
         this.nombreUsuarioTrabajador = nombreUsuarioTrabajador;
+        this.imagenPath = imagenPath;
     }
 
     public Long getId() { return id; }
@@ -44,4 +46,7 @@ public class PublicacionResponseDTO {
 
     public String getNombreUsuarioTrabajador() { return nombreUsuarioTrabajador; }
     public void setNombreUsuarioTrabajador(String nombreUsuarioTrabajador) { this.nombreUsuarioTrabajador = nombreUsuarioTrabajador; }
+
+    public String getImagenPath() { return imagenPath; }
+    public void setImagenPath(String imagenPath) { this.imagenPath = imagenPath; }
 }

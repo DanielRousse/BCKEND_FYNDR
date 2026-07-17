@@ -134,6 +134,35 @@ export function initCrearPublicacionPage() {
         return;
     }
 
+    // Cargar profesiones dinámicamente desde el backend
+    const selectSegmento = form.querySelector('#profesion-segmento');
+    const selectCategoria = form.querySelector('#categoria-servicio');
+    if (selectSegmento && selectCategoria) {
+        fetch('/api/profesiones/')
+            .then(res => {
+                if (!res.ok) return [];
+                return res.json();
+            })
+            .then(profesiones => {
+                if (profesiones.length > 0) {
+                    selectSegmento.innerHTML = '';
+                    selectCategoria.innerHTML = '';
+                    profesiones.forEach(prof => {
+                        const opt1 = document.createElement('option');
+                        opt1.value = prof.nombreProfesion;
+                        opt1.textContent = prof.nombreProfesion;
+                        selectSegmento.appendChild(opt1);
+
+                        const opt2 = document.createElement('option');
+                        opt2.value = prof.nombreProfesion;
+                        opt2.textContent = prof.nombreProfesion;
+                        selectCategoria.appendChild(opt2);
+                    });
+                }
+            })
+            .catch(err => console.error("Error al cargar profesiones:", err));
+    }
+
     const evidenceInput = form.querySelector('#evidencias-input');
     const previewContainer = form.querySelector('#evidencias-preview');
     const titleInput = form.querySelector('#titulo-servicio');
@@ -144,6 +173,22 @@ export function initCrearPublicacionPage() {
     if (evidenceInput && previewContainer) {
         evidenceInput.addEventListener('change', () => {
             renderEvidencePreview(evidenceInput.files, previewContainer);
+            
+            const previewImg = form.querySelector('#vista-previa-img');
+            const previewIcon = form.querySelector('#vista-previa-icono');
+            if (previewImg && previewIcon) {
+                if (evidenceInput.files && evidenceInput.files[0]) {
+                    fileToDataUrl(evidenceInput.files[0]).then(url => {
+                        previewImg.src = url;
+                        previewImg.classList.remove('d-none');
+                        previewIcon.classList.add('d-none');
+                    }).catch(err => console.error(err));
+                } else {
+                    previewImg.src = '';
+                    previewImg.classList.add('d-none');
+                    previewIcon.classList.remove('d-none');
+                }
+            }
         });
     }
 
@@ -226,7 +271,8 @@ export function initCrearPublicacionPage() {
                 titulo: info.tituloServicio || "Servicio",
                 descripcion: info.descripcionServicio || "",
                 precio: parseFloat(info.precioEstimado) || 0.0,
-                idUsuarioTrabajador: idTrabajador
+                idUsuarioTrabajador: idTrabajador,
+                imagenPath: evidencias.length > 0 ? evidencias[0].contenidoBase64 : ""
             };
 
             // Enviar al backend mediante fetch

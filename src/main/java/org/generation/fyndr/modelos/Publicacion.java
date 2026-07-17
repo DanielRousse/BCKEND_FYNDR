@@ -27,14 +27,22 @@ public class Publicacion {
     @JoinColumn(name = "id_usuario_trabajador", nullable = false)
     private UsuarioTrabajador usuarioTrabajador;
 
+    @Column(name = "imagen_path", columnDefinition = "LONGTEXT")
+    private String imagenPath;
+
     public Publicacion() {}
 
     public Publicacion(String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, UsuarioTrabajador usuarioTrabajador) {
+        this(titulo, descripcion, precio, fechaPublicacion, usuarioTrabajador, "");
+    }
+
+    public Publicacion(String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, UsuarioTrabajador usuarioTrabajador, String imagenPath) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.precio = precio;
         this.fechaPublicacion = fechaPublicacion;
         this.usuarioTrabajador = usuarioTrabajador;
+        this.imagenPath = imagenPath;
     }
 
     public Long getId() { return id; }
@@ -54,6 +62,9 @@ public class Publicacion {
 
     public UsuarioTrabajador getUsuarioTrabajador() { return usuarioTrabajador; }
     public void setUsuarioTrabajador(UsuarioTrabajador usuarioTrabajador) { this.usuarioTrabajador = usuarioTrabajador; }
+
+    public String getImagenPath() { return imagenPath; }
+    public void setImagenPath(String imagenPath) { this.imagenPath = imagenPath; }
 
     @Override
     public String toString() {

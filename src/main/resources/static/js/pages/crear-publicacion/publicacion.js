@@ -135,8 +135,9 @@ export function renderPublicacion() {
 
                             <div class="card-body text-center">
 
-                                <div class="border rounded p-5 mb-4">
-                                    <i class="bi bi-image display-1"></i>
+                                <div id="vista-previa-imagen-container" class="border rounded mb-4 d-flex align-items-center justify-content-center" style="height: 200px; background-color: #f8f9fa; overflow: hidden; border-radius: 8px;">
+                                    <i class="bi bi-image display-1 text-muted" id="vista-previa-icono"></i>
+                                    <img id="vista-previa-img" class="d-none w-100 h-100" style="object-fit: cover;">
                                 </div>
 
                                 <h5 id="vista-previa-titulo">

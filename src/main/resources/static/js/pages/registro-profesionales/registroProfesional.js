@@ -958,3 +958,57 @@ function renderPaso() {
     break;
     }
 }
+
+export async function initRegistroProfesionalPage() {
+    const token = localStorage.getItem('token');
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    
+    if (token && currentUser && currentUser.role === 'comun') {
+        try {
+            const res = await fetch('/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (res.ok) {
+                const user = await res.json();
+                
+                // Solo auto-llenar si los campos están vacíos actualmente en el estado
+                let stateUpdated = false;
+                if (!window.registroProfesionalState.datos.nombre) {
+                    window.registroProfesionalState.datos.nombre = user.nombre || "";
+                    stateUpdated = true;
+                }
+                if (!window.registroProfesionalState.datos.correo) {
+                    window.registroProfesionalState.datos.correo = user.email || "";
+                    stateUpdated = true;
+                }
+                if (!window.registroProfesionalState.datos.telefono) {
+                    window.registroProfesionalState.datos.telefono = user.telefono || "";
+                    stateUpdated = true;
+                }
+                
+                if (stateUpdated) {
+                    localStorage.setItem("registroProfesionalState", JSON.stringify(window.registroProfesionalState));
+                    
+                    // Si el elemento del DOM de Paso 1 ya está en pantalla, actualizar valores directamente
+                    const nombreInput = document.getElementById("nombre");
+                    const correoInput = document.getElementById("correo");
+                    const telefonoInput = document.getElementById("telefono");
+                    
+                    if (nombreInput && !nombreInput.value) {
+                        nombreInput.value = window.registroProfesionalState.datos.nombre;
+                    }
+                    if (correoInput && !correoInput.value) {
+                        correoInput.value = window.registroProfesionalState.datos.correo;
+                    }
+                    if (telefonoInput && !telefonoInput.value) {
+                        telefonoInput.value = window.registroProfesionalState.datos.telefono;
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Error al obtener datos para auto-llenado:", err);
+        }
+    }
+}

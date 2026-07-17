@@ -6,7 +6,7 @@ import { renderContactoPage, initContactoPage } from './pages/contacto/contacto.
 import { renderLoginPage, initLoginPage } from './pages/login/login.js';
 import { renderRegistroPage, initRegistroPage } from './pages/registro/registro.js';
 import { renderRegistroUsuarioPage, initRegistroUsuarioPage } from './pages/registro/registroUsuario.js';
-import { renderRegistroProfesionalPage } from './pages/registro-profesionales/registroProfesional.js';
+import { renderRegistroProfesionalPage, initRegistroProfesionalPage } from './pages/registro-profesionales/registroProfesional.js';
 import { renderCrearPublicacionPage, initCrearPublicacionPage } from './pages/crear-publicacion/crearPublicacion.js';
 import { renderPerfilProfesionalPage, initPerfilProfesionalPage } from './pages/perfil-profesional/perfilProfesional.js';
 import { renderHacerPedidoPage, initHacerPedidoPage } from './pages/hacer-pedido/hacerPedido.js';
@@ -24,7 +24,7 @@ const routes = {
     '#login': {render: renderLoginPage, init: initLoginPage },
     '#registro': { render: renderRegistroPage, init: initRegistroPage },
     '#registro-usuario': { render: renderRegistroUsuarioPage, init: initRegistroUsuarioPage },
-    '#registro-profesional': renderRegistroProfesionalPage,
+    '#registro-profesional': { render: renderRegistroProfesionalPage, init: initRegistroProfesionalPage },
     '#crear-publicacion': { render: renderCrearPublicacionPage, init: initCrearPublicacionPage },
     '#perfil-profesional': { render: renderPerfilProfesionalPage, init: initPerfilProfesionalPage },
     '#hacer-pedido': { render: renderHacerPedidoPage, init: initHacerPedidoPage },

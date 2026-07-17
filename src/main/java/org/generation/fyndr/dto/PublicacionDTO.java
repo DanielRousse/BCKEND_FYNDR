@@ -22,14 +22,17 @@ public class PublicacionDTO {
     @NotNull(message = "El ID del trabajador es obligatorio")
     private Long idUsuarioTrabajador;
 
+    private String imagenPath;
+
     public PublicacionDTO() {}
 
-    public PublicacionDTO(String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, Long idUsuarioTrabajador) {
+    public PublicacionDTO(String titulo, String descripcion, Double precio, LocalDateTime fechaPublicacion, Long idUsuarioTrabajador, String imagenPath) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.precio = precio;
         this.fechaPublicacion = fechaPublicacion;
         this.idUsuarioTrabajador = idUsuarioTrabajador;
+        this.imagenPath = imagenPath;
     }
 
     public String getTitulo() { return titulo; }
@@ -46,4 +49,7 @@ public class PublicacionDTO {
 
     public Long getIdUsuarioTrabajador() { return idUsuarioTrabajador; }
     public void setIdUsuarioTrabajador(Long idUsuarioTrabajador) { this.idUsuarioTrabajador = idUsuarioTrabajador; }
+
+    public String getImagenPath() { return imagenPath; }
+    public void setImagenPath(String imagenPath) { this.imagenPath = imagenPath; }
 }

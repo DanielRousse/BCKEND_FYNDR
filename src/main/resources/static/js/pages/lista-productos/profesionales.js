@@ -217,17 +217,26 @@ function inicializarLogicaProfesionales() {
             if (e.key === "Enter") ejecutarFlujoFiltrado();
         });
     }
+    // Sincronizar y escuchar cambios en inputs de ubicación
     const inputUbicacion = document.getElementById("ubicacion");
-    if (inputUbicacion) {
-        inputUbicacion.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") ejecutarFlujoFiltrado();
-        });
-    }
-
-    // Escuchar cambios en el input de ubicación lateral
     const inputFiltroUbicacion = document.getElementById("filtro-ubicacion");
-    if (inputFiltroUbicacion) {
-        inputFiltroUbicacion.addEventListener("input", ejecutarFlujoFiltrado);
+
+    if (inputUbicacion && inputFiltroUbicacion) {
+        inputUbicacion.addEventListener("input", (e) => {
+            inputFiltroUbicacion.value = e.target.value;
+            ejecutarFlujoFiltrado();
+        });
+        inputFiltroUbicacion.addEventListener("input", (e) => {
+            inputUbicacion.value = e.target.value;
+            ejecutarFlujoFiltrado();
+        });
+    } else {
+        if (inputUbicacion) {
+            inputUbicacion.addEventListener("input", ejecutarFlujoFiltrado);
+        }
+        if (inputFiltroUbicacion) {
+            inputFiltroUbicacion.addEventListener("input", ejecutarFlujoFiltrado);
+        }
     }
 
     // Escuchar cambios en el input de distancia lateral
@@ -319,17 +328,19 @@ function ejecutarFlujoFiltrado() {
         const cumpleServicioQuery = !queryServicio || pro.servicio.toLowerCase().includes(queryServicio) || pro.nombre.toLowerCase().includes(queryServicio);
         const cumplePrecio = pro.precio >= precioMin && pro.precio <= precioMax;
         const cumpleStars = pro.calificacion >= calificacionMin;
-        const cumpleUbicacion = !queryUbicacion || pro.direccion.toLowerCase().includes(queryUbicacion);
-        
-        let cumpleDistancia = true;
-        if (maxDistancia !== Infinity && queryUbicacion) {
-            const coordCliente = obtenerCoordenadas(queryUbicacion);
-            const coordPro = obtenerCoordenadas(pro.direccion);
-            const dist = calcularDistanciaKm(coordCliente.lat, coordCliente.lon, coordPro.lat, coordPro.lon);
-            cumpleDistancia = dist <= maxDistancia;
+        let cumpleUbicacion = true;
+        if (queryUbicacion) {
+            if (maxDistancia !== Infinity) {
+                const coordCliente = obtenerCoordenadas(queryUbicacion);
+                const coordPro = obtenerCoordenadas(pro.direccion);
+                const dist = calcularDistanciaKm(coordCliente.lat, coordCliente.lon, coordPro.lat, coordPro.lon);
+                cumpleUbicacion = dist <= maxDistancia;
+            } else {
+                cumpleUbicacion = pro.direccion.toLowerCase().includes(queryUbicacion);
+            }
         }
 
-        return cumpleServicioCheckbox && cumpleServicioQuery && cumplePrecio && cumpleStars && cumpleUbicacion && cumpleDistancia;
+        return cumpleServicioCheckbox && cumpleServicioQuery && cumplePrecio && cumpleStars && cumpleUbicacion;
     });
 
     profesionalesVisibles = 6;
