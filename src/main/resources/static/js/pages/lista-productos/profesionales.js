@@ -1,4 +1,4 @@
-import { geocodeAddress } from '../../geocoding.js';
+import { geocodeAddress, calcularDistanciaKm } from '../../geocoding.js';
 
 let profesionalesData = [];
 let profesionalesVisibles = 6;
@@ -261,6 +261,7 @@ function inicializarLogicaProfesionales() {
         inputFiltroDistancia.addEventListener("input", ejecutarFlujoFiltrado);
     }
 
+    const btnLimpiar = document.getElementById("btn-limpiar-filtros");
     if (btnLimpiar) {
         btnLimpiar.addEventListener("click", () => {
             document.getElementById("precio-min").value = "";
@@ -285,19 +286,18 @@ function inicializarLogicaProfesionales() {
     }
 }
 
-const COORD_MAP = {
-    "cdmx": { lat: 19.4326, lon: -99.1332 },
-    "centro": { lat: 19.4326, lon: -99.1332 },
-    "reforma": { lat: 19.4270, lon: -99.1677 },
-    "guadalajara": { lat: 20.6597, lon: -103.3496 },
-    "monterrey": { lat: 25.6866, lon: -100.3161 },
-    "puebla": { lat: 19.0413, lon: -98.2062 },
-    "queretaro": { lat: 20.5888, lon: -100.3899 },
-    "merida": { lat: 20.9674, lon: -89.5926 }
-};
-
-function obtenerCoordenadas(direccion) {
+function obtenerCoordenadasSync(direccion) {
     const dir = (direccion || "").toLowerCase();
+    const COORD_MAP = {
+        "cdmx": { lat: 19.4326, lon: -99.1332 },
+        "centro": { lat: 19.4326, lon: -99.1332 },
+        "reforma": { lat: 19.4270, lon: -99.1677 },
+        "guadalajara": { lat: 20.6597, lon: -103.3496 },
+        "monterrey": { lat: 25.6866, lon: -100.3161 },
+        "puebla": { lat: 19.0413, lon: -98.2062 },
+        "queretaro": { lat: 20.5888, lon: -100.3899 },
+        "merida": { lat: 20.9674, lon: -89.5926 }
+    };
     for (const key in COORD_MAP) {
         if (dir.includes(key)) {
             return COORD_MAP[key];
@@ -310,18 +310,6 @@ function obtenerCoordenadas(direccion) {
     const latOffset = (Math.abs(hash % 100)) / 1000;
     const lonOffset = (Math.abs((hash >> 8) % 100)) / 1000;
     return { lat: 19.4326 + latOffset, lon: -99.1332 + lonOffset };
-}
-
-function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radio de la Tierra en km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
 }
 
 function ejecutarFlujoFiltrado() {
@@ -347,10 +335,10 @@ function ejecutarFlujoFiltrado() {
         let cumpleUbicacion = true;
         if (queryUbicacion) {
             if (maxDistancia !== Infinity) {
-                const coordCliente = clientCoordinates || obtenerCoordenadas(queryUbicacion);
+                const coordCliente = clientCoordinates || obtenerCoordenadasSync(queryUbicacion);
                 const coordPro = {
-                    lat: pro.latitud || obtenerCoordenadas(pro.direccion).lat,
-                    lon: pro.longitud || obtenerCoordenadas(pro.direccion).lon
+                    lat: pro.latitud || obtenerCoordenadasSync(pro.direccion).lat,
+                    lon: pro.longitud || obtenerCoordenadasSync(pro.direccion).lon
                 };
                 const dist = calcularDistanciaKm(coordCliente.lat, coordCliente.lon, coordPro.lat, coordPro.lon);
                 cumpleUbicacion = dist <= maxDistancia;
@@ -436,8 +424,8 @@ function renderizarSegmento() {
 
         // Mapa markers logic
         if (listMarkersGroup) {
-            const lat = pro.latitud || obtenerCoordenadas(pro.direccion).lat;
-            const lon = pro.longitud || obtenerCoordenadas(pro.direccion).lon;
+            const lat = pro.latitud || obtenerCoordenadasSync(pro.direccion).lat;
+            const lon = pro.longitud || obtenerCoordenadasSync(pro.direccion).lon;
             const marker = L.marker([lat, lon]).bindPopup(`
                 <strong>${pro.nombre}</strong><br>
                 <small>${pro.servicio}</small><br>
